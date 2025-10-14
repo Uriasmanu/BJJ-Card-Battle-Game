@@ -2,7 +2,7 @@
 import LoginForm from "@/components/auth/login-form";
 import ProfileComponent from "@/components/profileComponent";
 
-export default function LoginPage() {
+export default function ProfilePage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-900 to-gray-950">
       <div className="w-full max-w-md space-y-8">
