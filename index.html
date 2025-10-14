@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jiu-Jitsu Battle Cards</title>
+    <!-- Carregando Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do Tailwind para usar a fonte Inter e a paleta de cores -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'bjj-bg': '#0F1419',         /* Fundo: Azul muito escuro/Preto */
+                        'bjj-primary': '#1E3A5F',    /* Primária: Azul Marinho */
+                        'bjj-secondary': '#4A6572',  /* Secundária: Azul Cinza */
+                        'bjj-highlight': '#F9A826',  /* Destaque: Dourado/Laranja */
+                        'bjj-text': '#E0E0E0',       /* Texto: Cinza claro */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos customizados para a estética "tarô marcial" e responsividade */
+        body {
+            background-color: theme('colors.bjj-bg');
+            color: theme('colors.bjj-text');
+            min-height: 100vh;
+        }
+
+        .card-container {
+            perspective: 1000px;
+        }
+
+        .bjj-card {
+            background-color: theme('colors.bjj-primary');
+            border: 3px solid theme('colors.bjj-highlight');
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            cursor: grab;
+            user-select: none;
+            will-change: transform;
+        }
+
+        .bjj-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(249, 168, 38, 0.4);
+        }
+
+        .bjj-card.superior {
+            background-color: #3b0764; /* Roxo Escuro para posições dominantes */
+        }
+
+        .bjj-card.guard {
+            background-color: theme('colors.bjj-secondary'); /* Cinza Azulado para posições de guarda */
+        }
+
+        .bjj-card.dragging {
+            cursor: grabbing;
+            opacity: 0.8;
+            transform: scale(1.1) rotate(5deg);
+            z-index: 50;
+        }
+
+        .play-area {
+            min-height: 12rem;
+            border: 3px dashed theme('colors.bjj-secondary');
+            transition: all 0.3s ease;
+        }
+
+        .play-area.active {
+            border-color: theme('colors.bjj-highlight');
+            background-color: rgba(249, 168, 38, 0.1);
+        }
+
+        .status-bar-bg {
+            background-color: theme('colors.bjj-secondary');
+        }
+
+        .hp-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Oculta scrollbars em dispositivos móveis */
+        .hand-area::-webkit-scrollbar {
+            display: none;
+        }
+        .hand-area {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .turn-message {
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0.8;
+                transform: scale(1.02);
+            }
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen p-2 sm:p-4 flex flex-col">
+
+    <!-- Cabeçalho e Painel de Mensagens -->
+    <header class="text-center mb-4">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-bjj-highlight tracking-widest uppercase">
+            Jiu-Jitsu: Card Battle
+        </h1>
+        <div id="message-area" class="mt-2 p-2 rounded-lg text-lg font-semibold text-center h-10 transition-colors duration-500">
+            Aguardando início do jogo...
+        </div>
+    </header>
+
+    <!-- Área Principal do Jogo (Responsiva) -->
+    <main class="flex-grow flex flex-col justify-between max-w-7xl mx-auto w-full">
+
+        <!-- Área do CPU (Topo) -->
+        <div id="cpu-area" class="player-area mb-4">
+            <div class="flex items-center justify-between p-3 rounded-lg status-bar-bg">
+                <div class="font-bold text-xl text-bjj-highlight flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h2"></path></svg>
+                    CPU
+                </div>
+                <div class="flex flex-col items-end">
+                    <div id="cpu-hp-text" class="text-sm font-medium">HP: 20/20</div>
+                    <div class="w-32 h-2 rounded-full bg-red-800 overflow-hidden">
+                        <div id="cpu-hp-bar" class="hp-bar h-full bg-red-500" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartas jogadas (CPU) -->
+            <div id="cpu-play-area" class="play-area mt-2 p-2 rounded-lg flex justify-center items-center">
+                <p class="text-bjj-secondary text-sm italic">O CPU joga a carta aqui</p>
+            </div>
+
+            <!-- Deck e Descarte do CPU -->
+            <div class="flex justify-center mt-2 space-x-4">
+                <div id="cpu-deck-count" class="text-sm">Deck: 10</div>
+                <div id="cpu-discard-count" class="text-sm">Descarte: 0</div>
+            </div>
+            
+            <!-- Mão do CPU (Oculta) -->
+            <div id="cpu-hand" class="flex justify-center mt-2 space-x-2">
+                <!-- Cartas do CPU (apenas verso) -->
+            </div>
+        </div>
+        
+        <!-- Área Central de Combate (onde as cartas se encontram) -->
+        <div id="combat-zone" class="flex justify-center items-center py-4 space-x-4">
+            <!-- Cartas jogadas de ambos os lados -->
+            <div id="player-card-played" class="w-[100px] h-[150px] sm:w-[150px] sm:h-[220px] rounded-xl bg-bjj-secondary flex items-center justify-center text-sm text-bjj-text font-bold p-2">Sua Carta</div>
+            <span class="text-4xl text-bjj-highlight font-black">VS</span>
+            <div id="cpu-card-played" class="w-[100px] h-[150px] sm:w-[150px] sm:h-[220px] rounded-xl bg-bjj-secondary flex items-center justify-center text-sm text-bjj-text font-bold p-2">Carta CPU</div>
+        </div>
+
+        <!-- Área do Jogador (Rodapé) -->
+        <div id="player-area" class="player-area mt-4">
+
+            <!-- Cartas jogadas (Jogador) -->
+            <div id="player-play-area" class="play-area mb-2 p-2 rounded-lg flex justify-center items-center">
+                <p class="text-bjj-secondary text-sm italic">Arraste sua carta para cá</p>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 rounded-lg status-bar-bg">
+                <div class="flex flex-col items-start">
+                    <div id="player-hp-text" class="text-sm font-medium">HP: 20/20</div>
+                    <div class="w-32 h-2 rounded-full bg-red-800 overflow-hidden">
+                        <div id="player-hp-bar" class="hp-bar h-full bg-red-500" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="font-bold text-xl text-bjj-highlight flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    JOGADOR
+                </div>
+                <div class="flex flex-col items-end">
+                    <div id="player-energy-text" class="text-sm font-medium">Energia: 3/3</div>
+                    <div id="player-energy-icons" class="flex space-x-1">
+                        <!-- Ícones de energia -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mão do Jogador (Arraste e Solte) -->
+            <div id="player-hand" class="hand-area mt-2 p-2 rounded-lg flex justify-start space-x-4 overflow-x-auto">
+                <!-- As cartas do jogador serão inseridas aqui -->
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- Botões de Ação e Status -->
+    <div class="flex justify-center mt-4 space-x-4">
+        <button id="start-button" class="px-6 py-2 bg-bjj-highlight text-bjj-bg font-bold rounded-lg shadow-lg hover:bg-orange-600 transition duration-200 uppercase">
+            Iniciar Batalha
+        </button>
+        <div class="flex flex-col items-center">
+            <div id="player-deck-count" class="text-sm">Deck: 10</div>
+            <div id="player-discard-count" class="text-sm">Descarte: 0</div>
+        </div>
+    </div>
+
+    <!-- Modal para mensagens de Fim de Jogo/Explicações -->
+    <div id="modal" class="fixed inset-0 bg-bjj-bg bg-opacity-90 hidden justify-center items-center z-50 p-4">
+        <div id="modal-content" class="bg-bjj-primary border-4 border-bjj-highlight p-6 rounded-xl max-w-lg w-full text-bjj-text shadow-2xl">
+            <h2 id="modal-title" class="text-3xl font-bold mb-4 text-bjj-highlight">Título</h2>
+            <p id="modal-body" class="mb-6"></p>
+            <button id="modal-close-button" class="w-full py-2 bg-bjj-highlight text-bjj-bg font-bold rounded-lg hover:bg-orange-600 transition duration-200">
+                Fechar e Continuar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais para o jogo
+        const MAX_HP = 20;
+        const MAX_ENERGY = 3;
+
+        const BJJ_CARDS = [
+            // Posições SUPERIORES (Dominantes)
+            { id: 1, name: "Montada", damage: 6, defense: 1, energyCost: 1, effect: 'CONTROL', positionType: 'SUPERIOR', description: 'O ápice do controle! Dificulta a defesa e a respiração do adversário.' },
+            { id: 2, name: "Montada nas Costas", damage: 7, defense: 0, energyCost: 1, effect: 'SUBMISSION', positionType: 'SUPERIOR', description: 'O ataque mais perigoso, com o foco total na Finalização (Estrangulamento).' },
+            { id: 3, name: "100 Kilos", damage: 4, defense: 3, energyCost: 1, effect: 'CONTROL', positionType: 'SUPERIOR', description: 'Controle lateral que amassa o adversário, minando sua energia e vontade.' },
+            { id: 4, name: "Joelho na Barriga", damage: 5, defense: 1, energyCost: 1, effect: 'TRANSITION', positionType: 'SUPERIOR', description: 'Posição que gera pontos e permite transições fáceis. Causa dor considerável.' },
+            { id: 5, name: "Pegada pelas Costas", damage: 6, defense: 0, energyCost: 1, effect: 'SUBMISSION', positionType: 'SUPERIOR', description: 'Essencialmente a Montada nas Costas, antes de firmar o cinto de segurança. Foco em estrangular.' },
+            { id: 6, name: "Side Control", damage: 4, defense: 2, energyCost: 1, effect: 'CONTROL', positionType: 'SUPERIOR', description: 'Domínio lateral, garante estabilidade e força o oponente a errar.' },
+            // Posições de GUARDA (Inferiores/Defensivas)
+            { id: 7, name: "Guarda Fechada", damage: 3, defense: 4, energyCost: 1, effect: 'DEFENSE', positionType: 'GUARD', description: 'Um cadeado defensivo que impede o adversário de progredir ou sair da sua posição.' },
+            { id: 8, name: "Guarda Aberta", damage: 4, defense: 2, energyCost: 1, effect: 'TRANSITION', positionType: 'GUARD', description: 'Guarda dinâmica que permite ataques rápidos e reversões (raspagem).' },
+            { id: 9, name: "Meia-Guarda", damage: 2, defense: 5, energyCost: 1, effect: 'DEFENSE', positionType: 'GUARD', description: 'Excelente posição de defesa onde o adversário controla apenas uma perna. Forte base para raspagem.' },
+            { id: 10, name: "Guarda-X", damage: 3, defense: 3, energyCost: 1, effect: 'TRANSITION', positionType: 'GUARD', description: 'Guarda moderna que desequilibra o oponente e é ótima para transições e raspagens.' },
+        ];
+
+        let gameState = {
+            player: {
+                hp: MAX_HP,
+                energy: MAX_ENERGY,
+                deck: [],
+                hand: [],
+                discard: [],
+                controlEffect: 0, // Dano reduzido no próximo turno
+            },
+            cpu: {
+                hp: MAX_HP,
+                energy: MAX_ENERGY,
+                deck: [],
+                hand: [],
+                discard: [],
+                controlEffect: 0,
+            },
+            isPlayerTurn: false,
+            gameActive: false,
+            turn: 0,
+            animationLock: false,
+        };
+
+        // --- Funções de Utilitário de Jogo ---
+
+        /** Função para embaralhar um array (Algoritmo Fisher-Yates) */
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /** Cria uma cópia do deck base, embaralha e retorna */
+        function createAndShuffleDeck() {
+            const deck = [...BJJ_CARDS, ...BJJ_CARDS]; // Deck de 20 cartas (2 cópias de cada)
+            shuffle(deck);
+            return deck;
+        }
+
+        /** Inicializa o estado do jogo */
+        function initGame() {
+            gameState.player.hp = MAX_HP;
+            gameState.cpu.hp = MAX_HP;
+            gameState.player.deck = createAndShuffleDeck();
+            gameState.cpu.deck = createAndShuffleDeck();
+            gameState.player.hand = [];
+            gameState.cpu.hand = [];
+            gameState.player.discard = [];
+            gameState.cpu.discard = [];
+            gameState.player.controlEffect = 0;
+            gameState.cpu.controlEffect = 0;
+            gameState.turn = 0;
+            gameState.gameActive = true;
+            gameState.isPlayerTurn = true; // Jogador sempre começa
+
+            // Limpa as áreas de jogo
+            document.getElementById('player-hand').innerHTML = '';
+            document.getElementById('cpu-hand').innerHTML = '';
+            document.getElementById('player-card-played').innerHTML = 'Sua Carta';
+            document.getElementById('cpu-card-played').innerHTML = 'Carta CPU';
+            document.getElementById('player-play-area').innerHTML = '<p class="text-bjj-secondary text-sm italic">Arraste sua carta para cá</p>';
+            document.getElementById('cpu-play-area').innerHTML = '<p class="text-bjj-secondary text-sm italic">O CPU joga a carta aqui</p>';
+            
+            // Compra a mão inicial (5 cartas)
+            for (let i = 0; i < 5; i++) {
+                drawCard('player');
+                drawCard('cpu');
+            }
+            
+            document.getElementById('start-button').textContent = 'Reiniciar Batalha';
+            
+            updateGameUI();
+            setMessage("Sua vez! Jogue uma carta (1 de energia).", 'bg-bjj-highlight text-bjj-bg turn-message');
+            startTurn('player');
+        }
+
+        /** Compra uma carta do deck para a mão do jogador especificado */
+        function drawCard(playerType) {
+            const player = gameState[playerType];
+            if (player.deck.length === 0) {
+                // Se o deck acabar, embaralha o descarte e o transforma no novo deck
+                if (player.discard.length > 0) {
+                    player.deck = player.discard;
+                    player.discard = [];
+                    shuffle(player.deck);
+                    setMessage(`O deck de ${playerType === 'player' ? 'você' : 'CPU'} foi embaralhado.`, 'bg-bjj-secondary text-bjj-text');
+                } else {
+                    // Sem deck e sem descarte, não compra
+                    return;
+                }
+            }
+
+            if (player.hand.length < 8) { // Limite de 8 cartas na mão
+                const card = player.deck.pop();
+                player.hand.push(card);
+            }
+        }
+
+        /** Cria e retorna o elemento HTML da carta */
+        function createCardElement(cardData, isDraggable) {
+            const element = document.createElement('div');
+            element.id = `card-${cardData.id}-${cardData.instanceId}`;
+            element.dataset.cardId = cardData.id;
+            element.dataset.instanceId = cardData.instanceId;
+            element.classList.add('bjj-card', 'rounded-xl', 'p-2', 'sm:p-3', 'w-24', 'h-36', 'sm:w-36', 'sm:h-52', 'text-xs', 'sm:text-sm', 'flex', 'flex-col', 'justify-between', 'card-container');
+            element.classList.add(cardData.positionType.toLowerCase());
+            
+            if (isDraggable) {
+                element.setAttribute('draggable', 'true');
+            }
+
+            let positionIcon = cardData.positionType === 'SUPERIOR' ? 
+                '<svg class="w-4 h-4 sm:w-6 sm:h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>' : // Seta para cima
+                '<svg class="w-4 h-4 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'; // Seta para baixo
+
+            let effectText = cardData.effect === 'DEFENSE' ? 'DEFESA' : cardData.effect;
+
+            element.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <span class="text-bjj-highlight font-bold text-lg sm:text-2xl">${cardData.damage}</span>
+                    <span class="text-xs sm:text-sm font-semibold uppercase tracking-wider">${cardData.positionType === 'SUPERIOR' ? 'Domínio' : 'Guarda'}</span>
+                </div>
+                <div class="text-center font-extrabold text-bjj-text text-sm sm:text-lg leading-tight">
+                    ${cardData.name}
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flex justify-between w-full text-bjj-text">
+                        <span class="text-xs sm:text-sm font-medium flex items-center">${positionIcon} ${effectText}</span>
+                        <span class="text-xs sm:text-sm font-medium">Def: ${cardData.defense}</span>
+                    </div>
+                    <div class="text-center mt-1 w-full bg-bjj-secondary rounded-full p-0.5 text-bjj-text font-bold text-xs">
+                        EN: ${cardData.energyCost}
+                    </div>
+                </div>
+            `;
+            
+            // Adiciona a explicação da posição ao clicar/tocar na carta
+            element.addEventListener('click', () => {
+                showModal(cardData.name, `
+                    <p class="font-bold mb-2 uppercase">${cardData.positionType === 'SUPERIOR' ? 'Posição Dominante' : 'Posição de Guarda'}</p>
+                    <p class="italic mb-4">${cardData.description}</p>
+                    <hr class="border-bjj-highlight my-2">
+                    <p>Dano Base: ${cardData.damage} | Defesa: ${cardData.defense} | Efeito: ${effectText}</p>
+                `);
+            });
+
+            return element;
+        }
+
+        /** Atualiza o HTML com o estado atual do jogo */
+        function updateGameUI() {
+            // HP Bars
+            document.getElementById('player-hp-text').textContent = `HP: ${gameState.player.hp}/${MAX_HP}`;
+            document.getElementById('cpu-hp-text').textContent = `HP: ${gameState.cpu.hp}/${MAX_HP}`;
+            document.getElementById('player-hp-bar').style.width = `${(gameState.player.hp / MAX_HP) * 100}%`;
+            document.getElementById('cpu-hp-bar').style.width = `${(gameState.cpu.hp / MAX_HP) * 100}%`;
+
+            // Energy
+            document.getElementById('player-energy-text').textContent = `Energia: ${gameState.player.energy}/${MAX_ENERGY}`;
+            const energyIcons = document.getElementById('player-energy-icons');
+            energyIcons.innerHTML = '';
+            for (let i = 0; i < MAX_ENERGY; i++) {
+                const color = i < gameState.player.energy ? 'text-bjj-highlight' : 'text-bjj-secondary';
+                energyIcons.innerHTML += `<svg class="w-4 h-4 ${color}" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>`;
+            }
+
+            // Deck/Discard Counts
+            document.getElementById('player-deck-count').textContent = `Deck: ${gameState.player.deck.length}`;
+            document.getElementById('player-discard-count').textContent = `Descarte: ${gameState.player.discard.length}`;
+            document.getElementById('cpu-deck-count').textContent = `Deck: ${gameState.cpu.deck.length}`;
+            document.getElementById('cpu-discard-count').textContent = `Descarte: ${gameState.cpu.discard.length}`;
+
+            // Player Hand (re-render)
+            const playerHandElement = document.getElementById('player-hand');
+            playerHandElement.innerHTML = '';
+            gameState.player.hand.forEach((card, index) => {
+                // Adiciona um ID de instância para o drag and drop
+                if (!card.instanceId) card.instanceId = `${gameState.turn}-${index}-${Date.now()}`; 
+                const cardElement = createCardElement(card, gameState.isPlayerTurn && !gameState.animationLock);
+                playerHandElement.appendChild(cardElement);
+            });
+
+            // CPU Hand (apenas versos)
+            const cpuHandElement = document.getElementById('cpu-hand');
+            cpuHandElement.innerHTML = '';
+            for (let i = 0; i < gameState.cpu.hand.length; i++) {
+                cpuHandElement.innerHTML += `<div class="bjj-card rounded-xl w-12 h-18 sm:w-16 sm:h-24 bg-bjj-primary border-bjj-secondary flex items-center justify-center text-xs sm:text-sm font-bold opacity-75">BJJ</div>`;
+            }
+        }
+
+        /** Inicia o turno, reabastece energia e compra cartas */
+        function startTurn(playerType) {
+            gameState.animationLock = false;
+            const player = gameState[playerType];
+            
+            // 1. Regenera Energia
+            player.energy = MAX_ENERGY;
+
+            // 2. Aplica Efeito de Controle Recebido
+            if (player.controlEffect > 0) {
+                player.energy = Math.max(0, player.energy - player.controlEffect);
+                player.controlEffect = 0;
+                setMessage(`${playerType === 'player' ? 'Você' : 'CPU'} perdeu 1 de energia devido ao efeito CONTROL.`, 'bg-red-900');
+            }
+
+            // 3. Compra 1 carta (se tiver menos de 8)
+            if (player.hand.length < 8) {
+                 drawCard(playerType);
+            }
+           
+            // 4. Atualiza UI e define o estado do turno
+            gameState.isPlayerTurn = (playerType === 'player');
+            updateGameUI();
+            
+            if (playerType === 'player') {
+                setMessage("Sua vez! Jogue uma carta (1 de energia).", 'bg-bjj-highlight text-bjj-bg turn-message');
+                setupDragAndDrop();
+            } else {
+                setMessage("Vez do CPU...", 'bg-bjj-secondary text-bjj-text turn-message');
+                setTimeout(cpuTurn, 1500); // Dá um tempo para o jogador ler
+            }
+        }
+
+        /** Lógica do CPU */
+        function cpuTurn() {
+            if (!gameState.gameActive) return;
+            const cpu = gameState.cpu;
+            
+            // 1. Filtra cartas jogáveis (custo 1)
+            const playableCards = cpu.hand.filter(card => card.energyCost <= cpu.energy);
+
+            if (playableCards.length === 0) {
+                setMessage("O CPU não pôde jogar uma carta e passou a vez.", 'bg-bjj-secondary text-bjj-text');
+                endTurn();
+                return;
+            }
+
+            // 2. CPU AI: Simplesmente joga a carta de MAIOR DANO
+            playableCards.sort((a, b) => b.damage - a.damage);
+            const cardToPlay = playableCards[0];
+            
+            handleCardPlay('cpu', cardToPlay);
+        }
+
+        /** Função principal de combate */
+        async function handleCardPlay(playerType, cardData) {
+            if (gameState.animationLock || !gameState.gameActive) return;
+
+            const player = gameState[playerType];
+            const opponentType = playerType === 'player' ? 'cpu' : 'player';
+            const opponent = gameState[opponentType];
+            
+            // 1. Verifica energia
+            if (player.energy < cardData.energyCost) {
+                if (playerType === 'player') {
+                    setMessage("Energia insuficiente para jogar essa carta!", 'bg-red-800');
+                    return;
+                }
+                // CPU não deveria chegar aqui se a filtragem estiver correta, mas por segurança
+                return; 
+            }
+
+            gameState.animationLock = true;
+            player.energy -= cardData.energyCost;
+
+            // 2. Remove a carta da mão e a coloca no descarte temporariamente
+            const cardIndex = player.hand.findIndex(c => c.instanceId === cardData.instanceId);
+            if (cardIndex !== -1) {
+                player.hand.splice(cardIndex, 1);
+            }
+            
+            // 3. Renderiza a carta na área de combate
+            const cardElement = createCardElement(cardData, false);
+            const playAreaElement = document.getElementById(playerType === 'player' ? 'player-card-played' : 'cpu-card-played');
+            playAreaElement.innerHTML = '';
+            playAreaElement.appendChild(cardElement);
+
+            // Se for o turno do Jogador, espera pela jogada do CPU (se o jogo estiver ativo)
+            if (playerType === 'player') {
+                updateGameUI();
+                await new Promise(resolve => setTimeout(resolve, 800)); // Pequena pausa
+                if (gameState.gameActive) {
+                    setMessage("Jogada em andamento... esperando a resposta do CPU.", 'bg-bjj-secondary text-bjj-text');
+                    
+                    // CPU joga uma carta
+                    const cpu = gameState.cpu;
+                    const playableCards = cpu.hand.filter(card => card.energyCost <= cpu.energy);
+                    
+                    if (playableCards.length === 0) {
+                        // CPU passa a vez
+                        setMessage("O CPU não tinha energia/carta e passa a vez. Você atacou sem resposta!", 'bg-green-800');
+                        await resolveCombat(playerType, cardData, null);
+                        return;
+                    }
+                    
+                    // CPU AI: joga a de maior defesa se estiver na guarda ou de maior dano se for superior
+                    const isPlayerSuperior = cardData.positionType === 'SUPERIOR';
+                    playableCards.sort((a, b) => {
+                        if (isPlayerSuperior) {
+                            // Se o Jogador domina, CPU prioriza defesa/controle
+                            return b.defense - a.defense;
+                        } else {
+                            // Se o Jogador está na guarda, CPU prioriza dano/submissão
+                            return b.damage - a.damage;
+                        }
+                    });
+
+                    const cpuCard = playableCards[0];
+                    const cpuCardIndex = cpu.hand.findIndex(c => c.instanceId === cpuCard.instanceId);
+                    cpu.hand.splice(cpuCardIndex, 1);
+                    cpu.energy -= cpuCard.energyCost;
+
+                    const cpuCardElement = createCardElement(cpuCard, false);
+                    document.getElementById('cpu-card-played').innerHTML = '';
+                    document.getElementById('cpu-card-played').appendChild(cpuCardElement);
+                    
+                    updateGameUI();
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Pausa para ver a carta do CPU
+                    
+                    await resolveCombat('both', cardData, cpuCard);
+                }
+            } else if (playerType === 'cpu') {
+                // Se for o turno do CPU jogando solo (CPU não faz jogada solo, sempre responde)
+                // A lógica de combate deve ser chamada pela função cpuTurn
+            }
+        }
+
+        /** Resolve o combate entre as cartas */
+        async function resolveCombat(attackerType, cardA, cardB) {
+            let message = "Confronto de Posições: ";
+            let playerHPChange = 0;
+            let cpuHPChange = 0;
+
+            const playerCard = attackerType === 'player' ? cardA : cardB;
+            const cpuCard = attackerType === 'player' ? cardB : cardA;
+            
+            // Caso de Passagem de Turno (Ataque solo do Jogador ou CPU)
+            if (!cpuCard) {
+                // Jogador atacou e CPU não respondeu
+                const finalDamage = Math.max(1, playerCard.damage - 2); // Dano reduzido por não ser um confronto
+                cpuHPChange -= finalDamage;
+                message += `${playerCard.name} (JOGADOR) aplica ${finalDamage} de dano sem defesa!`;
+            } else if (!playerCard) {
+                // CPU atacou e Jogador não respondeu (Isso não deve acontecer pela lógica de turnos)
+                const finalDamage = Math.max(1, cpuCard.damage - 2); 
+                playerHPChange -= finalDamage;
+                message += `${cpuCard.name} (CPU) aplica ${finalDamage} de dano sem defesa!`;
+            } else {
+                // Confronto de Cartas
+                
+                let damageToCPU = playerCard.damage;
+                let damageToPlayer = cpuCard.damage;
+                let combatLog = [];
+
+                // 1. Vantagem Posicional (SUPERIOR vs GUARD)
+                if (playerCard.positionType === 'SUPERIOR' && cpuCard.positionType === 'GUARD') {
+                    damageToCPU += 3; // Bônus de Dano
+                    combatLog.push("Vantagem Posicional JOGADOR: +3 Dano.");
+                } else if (playerCard.positionType === 'GUARD' && cpuCard.positionType === 'SUPERIOR') {
+                    damageToPlayer += 3; // Bônus de Dano (Posição Dominante do CPU)
+                    combatLog.push("Vantagem Posicional CPU: +3 Dano.");
+                }
+                
+                // 2. Aplica Efeitos de Defesa
+                let finalDamageToCPU = Math.max(1, damageToCPU - cpuCard.defense);
+                let finalDamageToPlayer = Math.max(1, damageToPlayer - playerCard.defense);
+                combatLog.push(`Defesa JOGADOR (${playerCard.defense}) | Defesa CPU (${cpuCard.defense}).`);
+                
+                // 3. Aplica Efeitos Especiais (SUBMISSION ignora Defesa)
+                if (playerCard.effect === 'SUBMISSION') {
+                    finalDamageToCPU = damageToCPU; // Defesa do CPU é ignorada
+                    combatLog.push("SUBMISSION (JOGADOR) Ignora Defesa!");
+                }
+                if (cpuCard.effect === 'SUBMISSION') {
+                    finalDamageToPlayer = damageToPlayer; // Defesa do Jogador é ignorada
+                    combatLog.push("SUBMISSION (CPU) Ignora Defesa!");
+                }
+                
+                // 4. Aplica Dano
+                cpuHPChange -= finalDamageToCPU;
+                playerHPChange -= finalDamageToPlayer;
+                
+                message = `JOGADOR joga ${playerCard.name} (${finalDamageToCPU} Dano Final) vs CPU joga ${cpuCard.name} (${finalDamageToPlayer} Dano Final).`;
+                combatLog.push(`Dano Final: CPU -${finalDamageToCPU} HP | JOGADOR -${finalDamageToPlayer} HP.`);
+                
+                // 5. Aplica Efeitos Especiais (CONTROL e TRANSITION)
+                if (playerCard.effect === 'CONTROL') {
+                    gameState.cpu.controlEffect += 1;
+                    combatLog.push("Efeito CONTROL (JOGADOR) aplicado ao CPU!");
+                }
+                if (cpuCard.effect === 'CONTROL') {
+                    gameState.player.controlEffect += 1;
+                    combatLog.push("Efeito CONTROL (CPU) aplicado ao JOGADOR!");
+                }
+                
+                if (playerCard.effect === 'TRANSITION') {
+                    gameState.player.energy = Math.min(MAX_ENERGY, gameState.player.energy + 1);
+                    combatLog.push("Efeito TRANSITION (JOGADOR): +1 Energia neste turno!");
+                }
+                if (cpuCard.effect === 'TRANSITION') {
+                    gameState.cpu.energy = Math.min(MAX_ENERGY, gameState.cpu.energy + 1);
+                    combatLog.push("Efeito TRANSITION (CPU): +1 Energia neste turno!");
+                }
+
+                // Exibir detalhes do combate
+                showModal("Resultado do Confronto", message + "<br><br>Detalhes:<br>" + combatLog.join("<br>"));
+
+                // Move cartas para o descarte
+                gameState.player.discard.push(playerCard);
+                if (cpuCard) {
+                    gameState.cpu.discard.push(cpuCard);
+                }
+            }
+
+            // 6. Atualiza HP
+            gameState.player.hp = Math.max(0, gameState.player.hp + playerHPChange);
+            gameState.cpu.hp = Math.max(0, gameState.cpu.hp + cpuHPChange);
+
+            // 7. Limpa a área de combate
+            document.getElementById('player-card-played').innerHTML = 'Sua Carta';
+            document.getElementById('cpu-card-played').innerHTML = 'Carta CPU';
+            document.getElementById('player-play-area').innerHTML = '<p class="text-bjj-secondary text-sm italic">Arraste sua carta para cá</p>';
+
+            updateGameUI();
+            
+            // 8. Verifica Fim de Jogo
+            if (gameState.player.hp <= 0 || gameState.cpu.hp <= 0) {
+                endGame();
+                return;
+            }
+
+            // 9. Finaliza turno
+            gameState.turn++;
+            gameState.animationLock = false;
+            endTurn();
+        }
+
+        /** Passa o turno para o próximo jogador */
+        function endTurn() {
+            if (gameState.gameActive) {
+                const nextPlayer = gameState.isPlayerTurn ? 'cpu' : 'player';
+                // Garante que o jogador que jogou tenha seu turno finalizado corretamente
+                gameState.isPlayerTurn = !gameState.isPlayerTurn; 
+                setTimeout(() => startTurn(nextPlayer), 1500); // Pequena pausa
+            }
+        }
+
+        /** Lógica de Fim de Jogo */
+        function endGame() {
+            gameState.gameActive = false;
+            let resultMessage = "";
+            let resultTitle = "";
+            
+            if (gameState.player.hp <= 0 && gameState.cpu.hp <= 0) {
+                resultTitle = "Empate (Double KO)!";
+                resultMessage = "Ambos os lutadores foram à lona ao mesmo tempo! Honra para os dois.";
+            } else if (gameState.player.hp <= 0) {
+                resultTitle = "Vitória do CPU!";
+                resultMessage = "Você foi finalizado ou nocauteado! Não se preocupe, volte ao dojo e treine mais. Oss!";
+            } else {
+                resultTitle = "VITÓRIA POR IMBATIBILIDADE!";
+                resultMessage = "Seu Jiu-Jitsu foi superior! Você derrotou o CPU. Mantenha o foco e continue vencendo!";
+                // Simples recompensa: salvar vitória (não implementado, apenas sugestão)
+            }
+            
+            document.getElementById('start-button').textContent = 'Jogar Novamente';
+            showModal(resultTitle, resultMessage, endGame = true);
+        }
+
+        /** Configura o Drag and Drop para as cartas do jogador */
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('#player-hand .bjj-card');
+            const dropArea = document.getElementById('player-play-area');
+            
+            cards.forEach(card => {
+                card.draggable = gameState.isPlayerTurn && !gameState.animationLock;
+                
+                card.ondragstart = (e) => {
+                    if (!gameState.isPlayerTurn || gameState.animationLock) {
+                        e.preventDefault();
+                        return;
+                    }
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        id: card.dataset.cardId,
+                        instanceId: card.dataset.instanceId
+                    }));
+                    card.classList.add('dragging');
+                };
+
+                card.ondragend = () => {
+                    card.classList.remove('dragging');
+                    dropArea.classList.remove('active');
+                };
+            });
+            
+            dropArea.ondragover = (e) => {
+                e.preventDefault();
+                dropArea.classList.add('active');
+            };
+
+            dropArea.ondragleave = () => {
+                dropArea.classList.remove('active');
+            };
+
+            dropArea.ondrop = (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('active');
+                
+                try {
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    const cardData = gameState.player.hand.find(c => c.instanceId === data.instanceId);
+                    
+                    if (cardData && cardData.energyCost <= gameState.player.energy) {
+                        handleCardPlay('player', cardData);
+                    } else if (cardData) {
+                        setMessage("Energia insuficiente para jogar essa carta!", 'bg-red-800');
+                    }
+                } catch (error) {
+                    console.error("Erro ao processar o drop:", error);
+                }
+            };
+        }
+
+        // --- Funções de UI e Mensagens ---
+        
+        /** Exibe uma mensagem na área de status */
+        function setMessage(text, classes = 'bg-bjj-secondary text-bjj-text') {
+            const msgArea = document.getElementById('message-area');
+            msgArea.className = `mt-2 p-2 rounded-lg text-lg font-semibold text-center h-10 transition-colors duration-500 ${classes}`;
+            msgArea.textContent = text;
+        }
+
+        /** Função para exibir o modal customizado (substitui alert/confirm) */
+        function showModal(title, body, isGameOver = false) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal').style.display = 'flex';
+
+            const closeButton = document.getElementById('modal-close-button');
+            if (isGameOver) {
+                closeButton.textContent = 'Ver Resultado';
+                closeButton.onclick = () => {
+                    document.getElementById('modal').style.display = 'none';
+                    // Poderia salvar o progresso aqui
+                };
+            } else {
+                closeButton.textContent = 'Entendido / Continuar';
+                closeButton.onclick = () => {
+                    document.getElementById('modal').style.display = 'none';
+                };
+            }
+        }
+        
+        // --- Event Listeners ---
+        
+        document.getElementById('start-button').addEventListener('click', initGame);
+
+        // Inicializa a UI ao carregar, mas o jogo só começa com o botão
+        document.addEventListener('DOMContentLoaded', () => {
+            updateGameUI();
+            setMessage("Clique em 'Iniciar Batalha' para começar.", 'bg-bjj-secondary text-bjj-text');
+        });
+
+    </script>
+</body>
+</html>
