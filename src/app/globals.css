@@ -120,3 +120,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-wave-slow {
+  animation: wave 55s linear infinite;
+}
+
+.animate-wave-medium {
+  animation: wave 50s linear infinite;
+}
+
+.animate-wave-fast {
+  animation: wave 45s linear infinite;
+}

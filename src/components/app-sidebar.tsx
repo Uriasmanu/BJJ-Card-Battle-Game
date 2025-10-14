@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, User, Search, Settings, Layers, Sword } from "lucide-react"
 
 import {
   Sidebar,
@@ -11,31 +11,25 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-// Menu items.
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Perfil",
+    url: "/profile",
+    icon: User, 
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    title: "Deck de técnicas",
+    url: "/deck",
+    icon: Layers, 
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
+    title: "Configurações",
+    url: "/settings",
     icon: Settings,
   },
 ]
@@ -43,9 +37,7 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent
-          className="bg-gray-900 text-white"
-      >
+      <SidebarContent className="bg-gray-900 text-white">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -53,8 +45,8 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
+                    <a href={item.url} className="flex items-center gap-3">
+                      <item.icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
