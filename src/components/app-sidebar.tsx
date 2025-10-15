@@ -13,17 +13,17 @@ import {
 
 const items = [
   {
-    title: "Home",
+    title: "Inicio",
     url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Perfil",
+    title: "Jogador",
     url: "/dashboard/profile",
     icon: User, 
   },
   {
-    title: "Deck de técnicas",
+    title: "Minhas Técnicas",
     url: "/deck",
     icon: Layers, 
   },
