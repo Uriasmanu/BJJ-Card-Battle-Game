@@ -1,6 +1,7 @@
 'use client';
 
 import CardBatalha from '@/components/cardBatalha';
+import CardTecnica from '@/components/cardTecnica';
 import { useState } from 'react';
 import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
 
@@ -54,7 +55,6 @@ export default function ArenaPage() {
 
   const handleCardClick = (cardId: string) => {
     setSelectedCard(cardId);
-    console.log('Carta selecionada:', cardId);
   };
 
   return (
@@ -117,28 +117,54 @@ export default function ArenaPage() {
           </div>
         </div>
 
-{/* Player Hand */}
-<div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-10
-                scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
-  <div className="flex space-x-2 sm:space-x-4">
-    {playerCards.map((card) => (
-      <div
-        key={card.id}
-        className={`
-          transition-all duration-300 flex-shrink-0
-          ${selectedCard === card.id 
-            ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30' 
-            : 'hover:transform hover:-translate-y-2 hover:scale-105'
-          }
-        `}
-      >
-        <CardBatalha {...card} onCardClick={handleCardClick} />
-      </div>
-    ))}
-  </div>
-</div>
+        {/* Player Hand */}
+        <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-10
+                        scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
+          <div className="flex space-x-2 sm:space-x-4">
+            {playerCards.map((card) => (
+              <div
+                key={card.id}
+                className={`
+                  transition-all duration-300 flex-shrink-0
+                  ${selectedCard === card.id 
+                    ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30' 
+                    : 'hover:transform hover:-translate-y-2 hover:scale-105'
+                  }
+                `}
+              >
+                <CardBatalha {...card} onCardClick={handleCardClick} />
+              </div>
+            ))}
+          </div>
+        </div>
 
+        {/* Modal da carta selecionada */}
+        {selectedCard && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedCard(null)}
+          >
+            <div
+              className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
+              onClick={(e) => e.stopPropagation()} // evita fechar ao clicar dentro
+            >
+              {/* Botão de fechar */}
+              <button
+                className="absolute top-3 right-3 text-white font-bold text-xl"
+                onClick={() => setSelectedCard(null)}
+              >
+                ×
+              </button>
 
+              {/* Carta detalhada */}
+              {playerCards
+                .filter((card) => card.id === selectedCard)
+                .map((card) => (
+                  <CardTecnica key={card.id} {...card} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Info dos Jogadores */}
         <div className="flex flex-col sm:flex-row justify-between items-center px-1 sm:px-2 relative z-20 gap-1 sm:gap-0">
