@@ -62,7 +62,8 @@ export default function ArenaPage() {
 
       {/* Tatame */}
       <div className="absolute inset-0 flex items-center justify-center z-0">
-        <div className="relative w-[95vmin] max-w-[800px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center">
+        <div className="relative w-[95vmin] max-w-[900px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center
+                        -translate-y-10 sm:translate-y-0">
           <div className="absolute inset-[10%] bg-blue-600 rounded-lg"></div>
         </div>
       </div>
@@ -86,9 +87,9 @@ export default function ArenaPage() {
         </div>
 
         {/* Área Central - Área de Combate */}
-        <div className="flex-1 flex items-center justify-center relative z-20 top-16 lg:top-8">
-          <div className="text-center w-full max-w-[500px] sm:max-w-[650px]">
-            <div className="rounded-xl p-4 sm:p-6 border border-white/10 bg-black/30">
+        <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
+          <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
+            <div className="rounded-xl p-4 sm:p-6 border border-white/10">
               <p className="text-white/90 text-base sm:text-lg font-semibold mb-2">Combate</p>
               <div className="flex justify-center items-center space-x-4">
 
