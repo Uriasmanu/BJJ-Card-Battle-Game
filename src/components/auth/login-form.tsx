@@ -83,7 +83,7 @@ export default function LoginForm() {
       </button>
 
       <p className="text-center text-xs sm:text-sm text-black mt-2">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <span className="text-blue-600 font-medium cursor-pointer">
           Sign Up
         </span>
