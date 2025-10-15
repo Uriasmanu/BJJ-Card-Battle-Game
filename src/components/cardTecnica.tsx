@@ -1,5 +1,6 @@
-// CardTecnica.tsx
-import { useState, useRef, useEffect } from 'react';
+// CardTecnica.tsx - VERSÃO CORRIGIDA
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface CardProps {
   id: string
@@ -36,7 +37,6 @@ export default function CardTecnica({
   const [gifErro, setGifErro] = useState(false);
   const [mostrarGif, setMostrarGif] = useState(false);
   const [conteudoCarregado, setConteudoCarregado] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
   
   const handleClick = () => {
     onCardClick?.(id)
@@ -76,10 +76,33 @@ export default function CardTecnica({
 
   // Texto formatado para dificuldade
   const textoDificuldade = {
-    facil: 'facil',
+    facil: 'Fácil',
     intermediario: 'Intermediário',
-    dificil: 'dificil'
+    dificil: 'Difícil'
   }
+
+  // Eager loading para a primeira imagem - CORREÇÃO AQUI
+  useEffect(() => {
+    if (imagemUrl && !mostrarGif) {
+      setConteudoCarregado(false);
+      // Pré-carregamento usando Image nativo do browser
+      const img = document.createElement('img');
+      img.src = imagemUrl;
+      img.onload = handleImageLoad;
+      img.onerror = handleImageError;
+    }
+  }, [imagemUrl, mostrarGif]);
+
+  // Eager loading para o GIF quando selecionado - CORREÇÃO AQUI
+  useEffect(() => {
+    if (gifUrl && mostrarGif) {
+      setConteudoCarregado(false);
+      const img = document.createElement('img');
+      img.src = gifUrl;
+      img.onload = handleImageLoad;
+      img.onerror = handleGifError;
+    }
+  }, [gifUrl, mostrarGif]);
 
   return (
     <div 
@@ -119,23 +142,28 @@ export default function CardTecnica({
           <div className={`transition-opacity duration-300 ${conteudoCarregado ? 'opacity-100' : 'opacity-0'}`}>
             {mostrarGif && temGif ? (
               // Mostrar GIF - Altura automática
-              <img 
-                ref={imgRef}
+              <Image 
                 src={gifUrl} 
                 alt={`GIF animado da técnica ${titulo}`}
                 onError={handleGifError}
                 onLoad={handleImageLoad}
-                className="w-full object-contain max-h-64" // Altura máxima para evitar cards muito grandes
+                width={400}
+                height={256}
+                className="w-full object-contain max-h-64"
+                priority={true} // ← IMPORTANTE: Carregamento prioritário
+                unoptimized={true} // Para GIFs animados
               />
             ) : temImagem ? (
               // Mostrar imagem estática - Altura automática
-              <img 
-                ref={imgRef}
+              <Image 
                 src={imagemUrl} 
                 alt={`Imagem da técnica ${titulo}`}
                 onError={handleImageError}
                 onLoad={handleImageLoad}
+                width={400}
+                height={256}
                 className="w-full object-contain max-h-64 transition-transform duration-200 hover:scale-105"
+                priority={true} // ← IMPORTANTE: Carregamento prioritário
               />
             ) : null}
           </div>
