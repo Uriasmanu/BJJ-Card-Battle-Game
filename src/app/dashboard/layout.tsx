@@ -12,7 +12,9 @@ export default function DashboardLayout({
       <AppSidebar />
       <main className="w-full">
         <SidebarTrigger />
-        {children}
+        <div className="px-10 py-4">
+          {children}
+        </div>
       </main>
     </SidebarProvider>
   );

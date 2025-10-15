@@ -77,7 +77,7 @@ export default function ProfileComponent() {
 
           <button className="w-4/5 py-2 px-4 text-sm font-semibold rounded-md text-gray-900 bg-amber-300 flex items-center justify-center gap-2 mx-auto">
             <Layers className="w-4 h-4" />
-            Gerenciar Meu Deck
+            Gerenciar Minhas Tecnicas
           </button>
         </div>
       </div>

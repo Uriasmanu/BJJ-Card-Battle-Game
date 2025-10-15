@@ -24,7 +24,7 @@ const items = [
   },
   {
     title: "Minhas Técnicas",
-    url: "/deck",
+    url: "/dashboard/tecnicas",
     icon: Layers, 
   },
   {

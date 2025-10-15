@@ -20,9 +20,9 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-cente py-4">
+    <div className="w-full min-h-screen flex items-center justify-cente">
 
-      <main className="flex flex-col px-5">
+      <main className="flex flex-col">
         <header>
           <h1 className="text-3xl font-extrabold text-gray-800 border-b pb-2">Informações do Jogador</h1>
           <p className="text-sm text-gray-500 mt-1">Gerencie seu perfil, veja seu progresso e acesse suas ferramentas.</p>
@@ -112,7 +112,7 @@ export default function ProfilePage() {
 
               <button className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-bold rounded-xl text-sidebar-dark bg-accent-yellow hover:bg-yellow-500 transition duration-150 shadow-md">
                 <svg className="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10s2.6 1.1 8 0c4.4-1 8-2 8 0 0 2-4 3-8 4-4 1-8 2-8 4v2c0 2 3 3 8 3s8-1 8-3" /></svg>
-                Gerenciar Meu Deck
+                Gerenciar Minhas Tecnicas
               </button>
             </div>
 
