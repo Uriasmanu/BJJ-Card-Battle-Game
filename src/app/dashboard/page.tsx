@@ -29,7 +29,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="max-w-md mx-auto space-y-6">
-            <button className="w-full py-4 px-6 text-lg font-bold rounded-lg text-gray-900 border-2 border-amber-300 flex items-center justify-center gap-3 bg-amber-300 hover:bg-amber-400 transition-all duration-300">
+            <button onClick={() => router.push("/dashboard/arena")}  className="w-full py-4 px-6 text-lg font-bold rounded-lg text-gray-900 border-2 border-amber-300 flex items-center justify-center gap-3 bg-amber-300 hover:bg-amber-400 transition-all duration-300">
               <HandFist className="w-6 h-6" />
               Iniciar Nova Luta
             </button>
