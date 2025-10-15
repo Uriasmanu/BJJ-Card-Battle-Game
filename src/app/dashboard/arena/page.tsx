@@ -37,19 +37,10 @@ export default function ArenaPage() {
     gifUrl: TECNICAS[1].gif
   };
 
-  const playerBattleCard = {
-    id: TECNICAS[3].id,
-    titulo: TECNICAS[3].nome,
-    categoria: TECNICAS[3].categoria,
-    descricao: TECNICAS[3].descricao,
-    faixa: TECNICAS[3].faixa,
-    pontos: TECNICAS[3].pontos,
-    corCategoria: obterCorCategoria(TECNICAS[3].categoria).cor,
-    dificuldade: TECNICAS[3].dificuldade,
-    corDificuldade: obterCorDificuldade(TECNICAS[3].dificuldade).cor,
-    imagemUrl: TECNICAS[3].imagem,
-    gifUrl: TECNICAS[3].gif
-  };
+  // Determina a carta que está no centro
+  const currentPlayerCard = activeCard
+    ? playerCards.find(card => card.id === activeCard)!
+    : playerCards[3]; // default playerBattleCard
 
   const handleCardClick = (cardId: string) => {
     setSelectedCard(cardId);
@@ -99,7 +90,7 @@ export default function ArenaPage() {
 
                 {/* Carta do Oponente */}
                 <div className="transform scale-90 lg:scale-100">
-                  <CardBatalha {...opponentCard} onCardClick={undefined} />
+                  <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes={true} />
                   <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                 </div>
 
@@ -110,9 +101,10 @@ export default function ArenaPage() {
                   </div>
                 </div>
 
-                {/* Carta do Jogador */}
+                {/* Carta do Jogador (agora dinâmica) */}
                 <div className="transform scale-90 lg:scale-100">
-                  <CardBatalha {...playerBattleCard} onCardClick={undefined} />
+                  {/* Aqui a magia: mostrar apenas a imagem no centro */}
+                  <CardBatalha {...currentPlayerCard} onCardClick={undefined} mostrarInformacoes={false} />
                   <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
                 </div>
 
@@ -136,7 +128,7 @@ export default function ArenaPage() {
                   }
                 `}
               >
-                <CardBatalha {...card} onCardClick={handleCardClick} />
+                <CardBatalha {...card} onCardClick={handleCardClick} mostrarInformacoes={true} />
               </div>
             ))}
           </div>
