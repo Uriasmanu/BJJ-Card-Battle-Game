@@ -1,64 +1,62 @@
-import React from "react";
-
 interface PlacarProps {
   timer?: string;
-  leftPlayer?: { name: string; team: string; score: number };
-  rightPlayer?: { name: string; team: string; score: number };
+  leftPlayer?: { name: string; score: number };
+  rightPlayer?: { name: string; score: number };
 }
 
 export default function Placar({
   timer = "05:10",
-  leftPlayer = { name: "REINALDO", team: "A. ASS. BRASIL", score: 9 },
-  rightPlayer = { name: "RODRIGO", team: "MMA UNIÃO", score: 7 },
+  leftPlayer = { name: "REINALDO", score: 9 },
+  rightPlayer = { name: "RODRIGO", score: 7 },
 }: PlacarProps) {
   return (
-    <div className="relative w-[22rem] mx-auto mt-4">
+    <div className="relative w-[14rem] max-w-full mx-auto">
       {/* Container geral do placar */}
-      <div className="relative flex bg-white rounded-xl shadow-lg overflow-hidden font-inter h-32">
+      <div className="relative flex bg-white rounded-xl shadow-lg overflow-hidden font-inter h-20">
+
         {/* Pontuações verticais - esquerda */}
-        <div className="flex flex-col justify-between items-center px-2 py-2 h-full">
-          <span className="text-green-500 text-xl font-bold">1</span>
-          <span className="text-red-600 text-xl font-bold">0</span>
+        <div className="flex flex-col justify-between items-center px-1 py-1 h-full rounded-l-xl bg-white/20 shadow-inner w-10">
+          <span className="text-green-500 text-lg font-bold">1</span>
+          <span className="text-red-600 text-lg font-bold">0</span>
         </div>
 
         {/* Lado esquerdo */}
-        <div className="flex-1 flex flex-col items-center justify-center bg-blue-600 text-white">
+        <div className="flex flex-col items-center justify-center bg-blue-600 text-white py-1 w-20">
           <div className="text-center">
-            <h2 className="text-sm sm:text-base font-bold uppercase">{leftPlayer.name}</h2>
-            <p className="text-xs sm:text-sm">{leftPlayer.team}</p>
+            <h2 className="text-[10px] font-bold uppercase">{leftPlayer.name}</h2>
           </div>
           <span
-            className="mt-2 font-extrabold"
-            style={{ fontSize: "clamp(2rem, 6vw, 3rem)" }}
+            className="mt-1 font-extrabold px-4"
+            style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)" }}
           >
             {leftPlayer.score}
           </span>
         </div>
 
         {/* Timer central */}
-        <div className="flex flex-col items-center justify-center bg-gray-100 text-gray-900 px-3">
-          <span className="text-sm sm:text-base font-semibold">{timer}</span>
+        <div className="flex flex-col items-center justify-center bg-gray-100 text-gray-900 px-1 w-14">
+          <span className="text-sm font-semibold">{timer}</span>
         </div>
 
         {/* Lado direito */}
-        <div className="flex-1 flex flex-col items-center justify-center bg-gray-200 text-black">
+        <div className="flex flex-col items-center justify-center bg-gray-200 text-black py-1 w-20">
           <div className="text-center">
-            <h2 className="text-sm sm:text-base font-bold uppercase">{rightPlayer.name}</h2>
-            <p className="text-xs sm:text-sm">{rightPlayer.team}</p>
+            <h2 className="text-[10px] font-bold uppercase">{rightPlayer.name}</h2>
           </div>
           <span
-            className="mt-2 font-extrabold"
-            style={{ fontSize: "clamp(2rem, 6vw, 3rem)" }}
+            className="mt-1 font-extrabold px-4"
+            style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)" }}
           >
             {rightPlayer.score}
           </span>
         </div>
 
         {/* Pontuações verticais - direita */}
-        <div className="flex flex-col justify-between items-center px-2 py-2 h-full">
-          <span className="text-green-500 text-xl font-bold">0</span>
-          <span className="text-red-600 text-xl font-bold">0</span>
+        <div className="flex flex-col justify-between items-center px-1 py-1 h-full rounded-r-xl bg-white/20 shadow-inner w-10">
+          <span className="text-green-500 text-lg font-bold">0</span>
+          <span className="text-red-600 text-lg font-bold">0</span>
         </div>
+
       </div>
     </div>
   );

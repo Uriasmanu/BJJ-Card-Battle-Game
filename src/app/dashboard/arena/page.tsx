@@ -55,9 +55,7 @@ export default function ArenaPage() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
-        <Placar />
-      </div>
+
       {/* Tatame */}
       <div className="absolute inset-0 flex items-center justify-center z-0">
         <div className="relative w-[95vmin] max-w-[900px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center -translate-y-10 sm:translate-y-0">
@@ -85,9 +83,12 @@ export default function ArenaPage() {
 
         {/* Área Central - Área de Combate */}
         <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
+                <Placar />
+            </div>
           <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
             <div className="rounded-xl p-4 sm:p-6 border border-white/10">
-              <p className="text-white/90 text-base sm:text-lg font-semibold mb-2">Combate</p>
+              <p className="text-white/90 text-base sm:text-lg font-semibold mb-5"></p>
               <div className="flex justify-center items-center space-x-4">
 
                 {/* Carta do Oponente */}
