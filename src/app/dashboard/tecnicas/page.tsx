@@ -144,9 +144,9 @@ export default function TecnicasPage() {
               pontos={t.pontos}
               corCategoria={obterCorCategoria(t.categoria).cor}
               dificuldade={
-                t.dificuldade === 'facil' ? 'iniciante' :
+                t.dificuldade === 'facil' ? 'facil' :
                   t.dificuldade === 'intermediario' ? 'intermediario' :
-                    'avancado'
+                    'dificil'
               }
               corDificuldade={obterCorDificuldade(t.dificuldade).cor}
               imagemUrl={t.imagem}

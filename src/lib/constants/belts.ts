@@ -15,7 +15,7 @@ export const BELTS: Belt[] = [
     color: '#FFFFFF',
     gradient: 'from-white to-gray-100',
     order: 1,
-    description: 'Iniciante - Fundamentos básicos'
+    description: 'facil - Fundamentos básicos'
   },
   {
     id: 'blue',
@@ -31,7 +31,7 @@ export const BELTS: Belt[] = [
     color: '#8B5CF6',
     gradient: 'from-purple-500 to-purple-600',
     order: 3,
-    description: 'Avançado - Game pessoal'
+    description: 'dificil - Game pessoal'
   },
   {
     id: 'brown',

@@ -9,7 +9,7 @@ interface CardProps {
   faixa: string
   pontos?: number
   corCategoria: string
-  dificuldade: 'iniciante' | 'intermediario' | 'avancado'
+  dificuldade: 'facil' | 'intermediario' | 'dificil'
   corDificuldade?: string
   imagemUrl?: string
   gifUrl?: string
@@ -69,16 +69,16 @@ export default function CardTecnica({
 
   // Mapeamento de ícones para dificuldade
   const iconesDificuldade = {
-    iniciante: '🟢',
+    facil: '🟢',
     intermediario: '🟠', 
-    avancado: '🔴'
+    dificil: '🔴'
   }
 
   // Texto formatado para dificuldade
   const textoDificuldade = {
-    iniciante: 'Iniciante',
+    facil: 'facil',
     intermediario: 'Intermediário',
-    avancado: 'Avançado'
+    dificil: 'dificil'
   }
 
   return (
