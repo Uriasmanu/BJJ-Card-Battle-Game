@@ -4,7 +4,6 @@ import banner from '../../../public/image/inicial.png'
 import ProfileComponent from "@/components/profileComponent";
 
 
-
 export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row">
@@ -16,7 +15,7 @@ export default function DashboardPage() {
           </h1>
 
           <div className="flex justify-center">
-            <Image 
+            <Image
               src={banner}
               alt="BJJ Battle Arena"
               width={500}
@@ -41,7 +40,15 @@ export default function DashboardPage() {
 
       {/* Profile - aparece apenas em telas grandes */}
       <div className="hidden lg:block w-70 xl:w-76 bg-gray-50 border-l border-gray-200">
-        <ProfileComponent />
+        <ProfileComponent
+          nome="Maria Santos"
+          titulo="Faixa Azul (Intermediário)"
+          faixaAtual="Faixa Azul"
+          progresso={65}
+          xpAtual={650}
+          xpProximaFaixa={1000}
+          onEditarPerfil={() => console.log('Editar perfil clicado')}
+        />
       </div>
     </div>
   );

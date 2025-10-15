@@ -1,6 +1,8 @@
 'use client';
 
+import ProfileComponent from "@/components/profileComponent";
 import { useState } from "react";
+
 
 
 export default function ProfilePage() {
@@ -59,28 +61,16 @@ export default function ProfilePage() {
                   <svg className="w-16 h-16" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                 </div>
 
+                <ProfileComponent
+                  nome="Maria Santos"
+                  titulo="Faixa Azul (Intermediário)"
+                  faixaAtual="Faixa Azul"
+                  progresso={65}
+                  xpAtual={650}
+                  xpProximaFaixa={1000}
+                  onEditarPerfil={() => console.log('Editar perfil clicado')}
+                />
 
-                <div className="flex-1 text-center md:text-left">
-                  <h2 className="text-4xl font-bold text-gray-900">João da Silva</h2>
-                  <p className="text-lg text-accent-orange font-semibold mt-1">UI / EX Designer (Aprendiz)</p>
-
-                  <div className="mt-6">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Faixa Atual: Faixa Branca</label>
-                    <div className="w-full bg-gray-200 rounded-full h-3.5">
-                      <div className="bg-accent-yellow h-3.5 rounded-full"></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>45% para Faixa Amarela</span>
-                      <span>Próxima Faixa: $500\ XP$</span>
-                    </div>
-                  </div>
-
-
-                  <button className="mt-6 inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-100 transition shadow-sm">
-                    <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
-                    Editar Perfil
-                  </button>
-                </div>
               </div>
             </div>
 
