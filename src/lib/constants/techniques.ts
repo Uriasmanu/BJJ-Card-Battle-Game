@@ -84,13 +84,13 @@ const getAssetPaths = (id: string) => ({
 export const TECNICAS: Tecnica[] = [
   // TÉCNICAS PERMITIDAS PARA FAIXA BRANCA
   {
-    id: 'armlock',
-    nome: 'Armlock',
+    id: 'armlock-da-montada',
+    nome: 'Armlock da montada',
     categoria: 'finalizacao',
     dificuldade: 'facil',
     descricao: 'Finalização articular do cotovelo a partir da montada',
     faixa: 'branca',
-    defesas: ['defesa-armlock'],
+    defesas: ['defesa-armlock-da-montada'],
     ...getAssetPaths('armlock'),
   },
   {
@@ -217,14 +217,14 @@ export const TECNICAS: Tecnica[] = [
 
   // DEFESAS DA FAIXA BRANCA
   {
-    id: 'defesa-armlock',
+    id: 'defesa-armlock-da-montada',
     nome: 'Defesa de Chave de Braço',
     categoria: 'defesa',
     dificuldade: 'facil',
     descricao: 'Una as mãos firmemente, faça ponte com os quadris e gire na direção do braço preso para aliviar a pressão',
     faixa: 'branca',
     defesas: [],
-    ...getAssetPaths('defesa-armlock'),
+    ...getAssetPaths('defesa-armlock-da-montada'),
   },
   {
     id: 'defesa-americana',
@@ -513,7 +513,7 @@ export const TECNICAS: Tecnica[] = [
     dificuldade: 'dificil',
     descricao: 'Chave de braço com movimento de rotação',
     faixa: 'roxa',
-    defesas: ['defesa-armlock'],
+    defesas: ['defesa-armlock-da-montada'],
     ...getAssetPaths('chave-braco-helicoptero'),
   },
 

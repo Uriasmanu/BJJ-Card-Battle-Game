@@ -15,9 +15,9 @@ export default function TecnicasPage() {
   // Filtrar técnicas baseado na busca e filtro
   const tecnicasFiltradas = tecnicas.filter((tecnica) => {
     const matchesBusca = tecnica.nome.toLowerCase().includes(busca.toLowerCase()) ||
-                        tecnica.descricao.toLowerCase().includes(busca.toLowerCase());
+      tecnica.descricao.toLowerCase().includes(busca.toLowerCase());
     const matchesFaixa = filtroFaixa === "todas" || tecnica.faixa === filtroFaixa.toLowerCase();
-    
+
     return matchesBusca && matchesFaixa;
   });
 
@@ -45,8 +45,8 @@ export default function TecnicasPage() {
     setTecnicas(prev => prev.filter(t => t.id !== id));
   };
 
-  // Calcular estatísticas
-  const totalPontos = tecnicas.reduce((sum, t) => sum + t.pontos, 0);
+  // Calcular estatísticas - CORREÇÃO AQUI
+  const totalPontos = tecnicas.reduce((sum, t) => sum + (t.pontos || 0), 0); // ← Adicione (t.pontos || 0)
   const totalFinalizacoes = tecnicas.filter(t => t.categoria === 'finalizacao').length;
 
   return (
@@ -90,10 +90,10 @@ export default function TecnicasPage() {
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl w-full focus:ring-yellow-500 focus:border-yellow-500 transition"
             />
           </div>
-          
+
           <div className="relative w-full md:w-40">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <select 
+            <select
               value={filtroFaixa}
               onChange={(e) => setFiltroFaixa(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-white w-full focus:ring-yellow-500 focus:border-yellow-500 transition appearance-none"
@@ -132,6 +132,7 @@ export default function TecnicasPage() {
       )}
 
       {/* Lista de técnicas */}
+      // No seu componente que lista as técnicas
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {tecnicasFiltradas.map((t) => (
           <div key={t.id} className="relative group">
@@ -143,8 +144,14 @@ export default function TecnicasPage() {
               faixa={`Faixa ${t.faixa.charAt(0).toUpperCase() + t.faixa.slice(1)}`}
               pontos={t.pontos}
               corCategoria={obterCorCategoria(t.categoria).cor}
-              dificuldade={t.dificuldade}
+              dificuldade={
+                t.dificuldade === 'facil' ? 'iniciante' :
+                  t.dificuldade === 'intermediario' ? 'intermediario' :
+                    'avancado'
+              }
               corDificuldade={obterCorDificuldade(t.dificuldade).cor}
+              imagemUrl={t.imagem}
+              gifUrl={t.gif} // ← Nova prop para o GIF
               onCardClick={(id) => console.log('Técnica clicada:', id)}
             />
             {/* Botão de remover */}
@@ -185,10 +192,10 @@ export default function TecnicasPage() {
                 <option value="">-- Escolha uma técnica --</option>
                 {TECNICAS.filter(t => !tecnicas.some(deckT => deckT.id === t.id)) // Não mostrar técnicas já adicionadas
                   .map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.nome} — Faixa {t.faixa.charAt(0).toUpperCase() + t.faixa.slice(1)} ({t.pontos > 0 ? `${t.pontos} pts` : 'Finalização'})
-                  </option>
-                ))}
+                    <option key={t.id} value={t.id}>
+                      {t.nome} — Faixa {t.faixa.charAt(0).toUpperCase() + t.faixa.slice(1)} ({t.pontos ? `${t.pontos} pts` : 'Finalização'}) {/* ← CORREÇÃO AQUI */}
+                    </option>
+                  ))}
               </select>
 
               {/* Prévia da técnica selecionada */}
@@ -202,7 +209,7 @@ export default function TecnicasPage() {
                         <p><strong>Nome:</strong> {tecnica.nome}</p>
                         <p><strong>Categoria:</strong> {tecnica.categoria}</p>
                         <p><strong>Dificuldade:</strong> {tecnica.dificuldade}</p>
-                        <p><strong>Pontos:</strong> {tecnica.pontos > 0 ? `${tecnica.pontos} pts` : 'Finalização'}</p>
+                        <p><strong>Pontos:</strong> {tecnica.pontos ? `${tecnica.pontos} pts` : 'Finalização'}</p> {/* ← CORREÇÃO AQUI */}
                       </div>
                     ) : null;
                   })()}
