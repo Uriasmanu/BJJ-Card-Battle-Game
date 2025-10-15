@@ -9,6 +9,25 @@ export interface Tecnica {
   faixa: 'branca' | 'azul' | 'roxa' | 'marrom' | 'preta'; 
 }
 
+// Cores para cada nível de dificuldade
+export const CORES_DIFICULDADE = {
+  iniciante: {
+    cor: '#22C55E', // Verde
+    classe: 'text-green-600 bg-green-100 border-green-300',
+    gradiente: 'from-green-500 to-green-600'
+  },
+  intermediario: {
+    cor: '#F97316', // Laranja
+    classe: 'text-orange-600 bg-orange-100 border-orange-300',
+    gradiente: 'from-orange-500 to-orange-600'
+  },
+  avancado: {
+    cor: '#EF4444', // Vermelho
+    classe: 'text-red-600 bg-red-100 border-red-300',
+    gradiente: 'from-red-500 to-red-600'
+  }
+};
+
 export const TECNICAS: Tecnica[] = [
   // Faixa Branca - Técnicas Básicas
   {
@@ -201,3 +220,6 @@ export const obterTecnicaPorId = (id: string): Tecnica | undefined =>
 
 export const obterTecnicasPorCategoria = (categoria: string): Tecnica[] => 
   TECNICAS.filter(tecnica => tecnica.categoria === categoria);
+
+export const obterCorDificuldade = (dificuldade: 'iniciante' | 'intermediario' | 'avancado') => 
+  CORES_DIFICULDADE[dificuldade];

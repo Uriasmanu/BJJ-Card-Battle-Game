@@ -38,21 +38,17 @@ export default function TecnicasPage() {
         </p>
       </header>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-2xl shadow-md mb-8 border border-gray-100">
-        <div className="mb-4 md:mb-0 flex space-x-6 text-sm">
+      {/* Painel de informações e ações */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-2xl shadow-md mb-8 border border-gray-100 gap-4">
+        {/* Informações do Deck */}
+        <div className="flex flex-col md:flex-row mb-4 md:mb-0 gap-4 md:gap-6 text-sm">
           <p className="text-gray-600">
-            Total no Deck:{" "}
-            <span className="font-bold text-gray-900">{tecnicas.length}</span>
-          </p>
-          <p className="text-gray-600">
-            Pontos de Força:{" "}
-            <span className="font-bold text-green-600">
-              {tecnicas.reduce((acc, t) => acc + (t.pontos || 0), 0)} Pts
-            </span>
+            Total no Deck: <span className="font-bold text-gray-900">{tecnicas.length}</span>
           </p>
         </div>
 
-        <div className="flex gap-4 w-full md:w-auto">
+        {/* Buscar, filtrar e adicionar */}
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           <input
             type="text"
             placeholder="Buscar técnica..."
@@ -66,10 +62,9 @@ export default function TecnicasPage() {
             <option>Marrom</option>
             <option>Preta</option>
           </select>
-
           <button
             onClick={() => setMostrarModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white font-semibold rounded-xl hover:bg-yellow-600 transition"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500 text-white font-semibold rounded-xl hover:bg-yellow-600 transition w-full md:w-auto"
           >
             <Plus /> Adicionar Técnica
           </button>
@@ -98,7 +93,7 @@ export default function TecnicasPage() {
           onClick={() => setMostrarModal(false)}
         >
           <div
-            className="bg-white rounded-2xl p-6 w-96 shadow-xl"
+            className="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl"
             onClick={(e) => e.stopPropagation()} // evita fechar ao clicar dentro
           >
             <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -119,20 +114,20 @@ export default function TecnicasPage() {
               ))}
             </select>
 
-            <div className="flex justify-end gap-3 mt-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-2">
               <button
                 onClick={() => {
                   setMostrarModal(false);
                   setTecnicaSelecionada("");
                 }}
-                className="px-4 py-2 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+                className="px-4 py-2 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-100 transition w-full sm:w-auto"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleAdd}
                 disabled={!tecnicaSelecionada}
-                className="px-4 py-2 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition disabled:opacity-50"
+                className="px-4 py-2 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition disabled:opacity-50 w-full sm:w-auto"
               >
                 Adicionar
               </button>
