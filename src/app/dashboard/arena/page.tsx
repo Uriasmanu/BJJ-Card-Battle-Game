@@ -4,6 +4,7 @@ import CardBatalha from '@/components/cardBatalha';
 import CardTecnica from '@/components/cardTecnica';
 import { useState } from 'react';
 import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
+import Placar from '@/components/placar';
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -37,10 +38,10 @@ export default function ArenaPage() {
     gifUrl: TECNICAS[1].gif
   };
 
-  // Determina a carta que está no centro
+  // Carta do jogador no centro
   const currentPlayerCard = activeCard
     ? playerCards.find(card => card.id === activeCard)!
-    : playerCards[3]; // default playerBattleCard
+    : playerCards[3]; // carta padrão
 
   const handleCardClick = (cardId: string) => {
     setSelectedCard(cardId);
@@ -54,11 +55,12 @@ export default function ArenaPage() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
-
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
+        <Placar />
+      </div>
       {/* Tatame */}
       <div className="absolute inset-0 flex items-center justify-center z-0">
-        <div className="relative w-[95vmin] max-w-[900px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center
-                        -translate-y-10 sm:translate-y-0">
+        <div className="relative w-[95vmin] max-w-[900px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center -translate-y-10 sm:translate-y-0">
           <div className="absolute inset-[10%] bg-blue-600 rounded-lg"></div>
         </div>
       </div>
@@ -90,7 +92,11 @@ export default function ArenaPage() {
 
                 {/* Carta do Oponente */}
                 <div className="transform scale-90 lg:scale-100">
-                  <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes={true} />
+                  <CardBatalha 
+                    {...opponentCard} 
+                    onCardClick={undefined} 
+                    mostrarInformacoes={false} 
+                  />
                   <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                 </div>
 
@@ -103,8 +109,11 @@ export default function ArenaPage() {
 
                 {/* Carta do Jogador (agora dinâmica) */}
                 <div className="transform scale-90 lg:scale-100">
-                  {/* Aqui a magia: mostrar apenas a imagem no centro */}
-                  <CardBatalha {...currentPlayerCard} onCardClick={undefined} mostrarInformacoes={false} />
+                  <CardBatalha 
+                    {...currentPlayerCard} 
+                    onCardClick={undefined} 
+                    mostrarInformacoes={false} 
+                  />
                   <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
                 </div>
 
@@ -114,8 +123,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Player Hand */}
-        <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-10
-                        scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
+        <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-10 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
           <div className="flex space-x-2 sm:space-x-4">
             {playerCards.map((card) => (
               <div
@@ -142,9 +150,8 @@ export default function ArenaPage() {
           >
             <div
               className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
-              onClick={(e) => e.stopPropagation()} // evita fechar ao clicar dentro
+              onClick={(e) => e.stopPropagation()} 
             >
-              {/* Botão de fechar */}
               <button
                 className="absolute top-3 right-3 text-white font-bold text-xl"
                 onClick={() => setSelectedCard(null)}
@@ -152,12 +159,11 @@ export default function ArenaPage() {
                 ×
               </button>
 
-              {/* Carta detalhada */}
               {playerCards
                 .filter((card) => card.id === selectedCard)
                 .map((card) => (
                   <div key={card.id}>
-                    <CardTecnica {...card} />
+                    <CardBatalha {...card} onCardClick={undefined} mostrarInformacoes={true} />
                     <div className="mt-4 flex justify-center space-x-4">
                       <button
                         className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
