@@ -117,25 +117,28 @@ export default function ArenaPage() {
           </div>
         </div>
 
-        {/* Player Hand */}
-        <div className="player-hand flex justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-1 min-h-[140px] sm:min-h-[160px] p-5 top-10">
-          <div className="flex space-x-[-4px] sm:space-x-[-6px]">
-            {playerCards.map((card) => (
-              <div
-                key={card.id}
-                className={`
-                  transition-all duration-300 flex-shrink-0
-                  ${selectedCard === card.id 
-                    ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30' 
-                    : 'hover:transform hover:-translate-y-2 hover:scale-105'
-                  }
-                `}
-              >
-                <CardBatalha {...card} onCardClick={handleCardClick} />
-              </div>
-            ))}
-          </div>
-        </div>
+{/* Player Hand */}
+<div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-10
+                scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
+  <div className="flex space-x-2 sm:space-x-4">
+    {playerCards.map((card) => (
+      <div
+        key={card.id}
+        className={`
+          transition-all duration-300 flex-shrink-0
+          ${selectedCard === card.id 
+            ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30' 
+            : 'hover:transform hover:-translate-y-2 hover:scale-105'
+          }
+        `}
+      >
+        <CardBatalha {...card} onCardClick={handleCardClick} />
+      </div>
+    ))}
+  </div>
+</div>
+
+
 
         {/* Info dos Jogadores */}
         <div className="flex flex-col sm:flex-row justify-between items-center px-1 sm:px-2 relative z-20 gap-1 sm:gap-0">
