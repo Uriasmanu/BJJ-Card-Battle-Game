@@ -97,7 +97,7 @@ export default function CardTecnica({
     >
       {/* Controles de imagem/GIF */}
       {temGif && temImagem && (
-        <div className="absolute top-2 right-2 z-10">
+        <div className="absolute top-2 left-2 z-10">
           <button
             onClick={toggleImagemGif}
             className="bg-black/70 text-white rounded-full p-1.5 text-xs hover:bg-black/90 transition-colors backdrop-blur-sm"
