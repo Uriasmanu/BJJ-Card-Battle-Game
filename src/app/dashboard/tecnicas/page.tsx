@@ -82,7 +82,9 @@ export default function TecnicasPage() {
             faixa={`Faixa ${t.faixa.charAt(0).toUpperCase() + t.faixa.slice(1)}`}
             pontos={t.pontos}
             corCategoria="#3b82f6"
+            imagemUrl={t.imagem} 
           />
+
         ))}
       </div>
 
