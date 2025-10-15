@@ -1,146 +1,162 @@
 'use client';
 
+import CardBatalha from '@/components/cardBatalha';
+import { useState } from 'react';
+import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
+
 export default function ArenaPage() {
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+
+  // Converter técnicas para o formato do CardBatalha
+  const playerCards = TECNICAS.slice(0, 5).map(tecnica => ({
+    id: tecnica.id,
+    titulo: tecnica.nome,
+    categoria: tecnica.categoria,
+    descricao: tecnica.descricao,
+    faixa: tecnica.faixa,
+    pontos: tecnica.pontos,
+    corCategoria: obterCorCategoria(tecnica.categoria).cor,
+    dificuldade: tecnica.dificuldade,
+    corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
+    imagemUrl: tecnica.imagem,
+    gifUrl: tecnica.gif
+  }));
+
+  // Carta do oponente em batalha
+  const opponentCard = {
+    id: TECNICAS[1].id,
+    titulo: TECNICAS[1].nome,
+    categoria: TECNICAS[1].categoria,
+    descricao: TECNICAS[1].descricao,
+    faixa: TECNICAS[1].faixa,
+    pontos: TECNICAS[1].pontos,
+    corCategoria: obterCorCategoria(TECNICAS[1].categoria).cor,
+    dificuldade: TECNICAS[1].dificuldade,
+    corDificuldade: obterCorDificuldade(TECNICAS[1].dificuldade).cor,
+    imagemUrl: TECNICAS[1].imagem,
+    gifUrl: TECNICAS[1].gif
+  };
+
+  // Carta do jogador em batalha
+  const playerBattleCard = {
+    id: TECNICAS[3].id,
+    titulo: TECNICAS[3].nome,
+    categoria: TECNICAS[3].categoria,
+    descricao: TECNICAS[3].descricao,
+    faixa: TECNICAS[3].faixa,
+    pontos: TECNICAS[3].pontos,
+    corCategoria: obterCorCategoria(TECNICAS[3].categoria).cor,
+    dificuldade: TECNICAS[3].dificuldade,
+    corDificuldade: obterCorDificuldade(TECNICAS[3].dificuldade).cor,
+    imagemUrl: TECNICAS[3].imagem,
+    gifUrl: TECNICAS[3].gif
+  };
+
+  const handleCardClick = (cardId: string) => {
+    setSelectedCard(cardId);
+    console.log('Carta selecionada:', cardId);
+  };
+
   return (
-    <div>
-      <div className="game-arena flex flex-col justify-between items-center p-4 min-h-screen">
+    <div className="min-h-screen bg-white relative overflow-x-hidden">
+
+      {/* Tatame */}
+      <div className="absolute inset-0 flex items-center justify-center z-0">
+        <div className="relative w-[95vmin] max-w-[800px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center">
+          <div className="absolute inset-[10%] bg-blue-600 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="relative z-10 flex flex-col min-h-screen justify-between p-1 sm:p-2">
+
         {/* Opponent Hand */}
-        <div className="opponent-hand flex justify-center mt-2 p-2 relative z-10">
-          <div 
-            className="opponent-card w-20 h-28 bg-slate-900 shadow-xl rounded-xl cursor-default opacity-90"
-            style={{ transform: 'rotateZ(-8deg)' }}
-          >
-            <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border-2 border-gray-700"></div>
+        <div className="opponent-hand flex justify-center mt-1 sm:mt-2 relative z-20 overflow-x-auto">
+          <div className="flex space-x-[-8px] sm:space-x-[-12px] px-1">
+            {[1, 2, 3, 4, 5].map((index) => (
+              <div 
+                key={index}
+                className="w-10 h-14 sm:w-12 sm:h-16 bg-slate-900 shadow-lg rounded-md cursor-default opacity-90 flex-shrink-0"
+                style={{ transform: `rotateZ(${-8 + (index-1)*4}deg)` }}
+              >
+                <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-md border border-gray-700"></div>
+              </div>
+            ))}
           </div>
-          <div 
-            className="opponent-card w-20 h-28 bg-slate-900 shadow-xl rounded-xl cursor-default opacity-90 mx-[-8px]"
-            style={{ transform: 'rotateZ(-4deg)' }}
-          >
-            <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border-2 border-gray-700"></div>
-          </div>
-          <div 
-            className="opponent-card w-20 h-28 bg-slate-900 shadow-xl rounded-xl cursor-default opacity-90 mx-[-8px]"
-            style={{ transform: 'rotateZ(0deg)' }}
-          >
-            <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border-2 border-gray-700"></div>
-          </div>
-          <div 
-            className="opponent-card w-20 h-28 bg-slate-900 shadow-xl rounded-xl cursor-default opacity-90 mx-[-8px]"
-            style={{ transform: 'rotateZ(4deg)' }}
-          >
-            <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border-2 border-gray-700"></div>
-          </div>
-          <div 
-            className="opponent-card w-20 h-28 bg-slate-900 shadow-xl rounded-xl cursor-default opacity-90 mx-[-8px]"
-            style={{ transform: 'rotateZ(8deg)' }}
-          >
-            <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border-2 border-gray-700"></div>
-          </div>
-          <span className="absolute top-[-40px] text-sm text-gray-400 font-semibold">
-            OPONENTE - 5 Cartas
-          </span>
         </div>
 
-        {/* Game Board */}
-        <div 
-          className="game-board flex justify-center items-center flex-grow w-full max-w-4xl my-8"
-          style={{ transform: 'rotateX(5deg) translateZ(0)' }}
-        >
-          <div className="w-full h-96 bg-gradient-to-br from-green-700 to-green-900 flex items-center justify-center p-4 rounded-md shadow-2xl border-4 border-green-600">
-            <div className="text-center">
-              <div className="mt-6 flex space-x-8">
-                <div className="w-24 h-36 bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-400 flex items-center justify-center text-sm text-gray-400">
-                  Pilha/Deck
+        {/* Área Central - Área de Combate */}
+        <div className="flex-1 flex items-center justify-center relative z-20 top-16 lg:top-8">
+          <div className="text-center w-full max-w-[500px] sm:max-w-[650px]">
+            <div className="rounded-xl p-4 sm:p-6 border border-white/10 bg-black/30">
+              <p className="text-white/90 text-base sm:text-lg font-semibold mb-2">Combate</p>
+              <div className="flex justify-center items-center space-x-4">
+
+                {/* Carta do Oponente */}
+                <div className="transform scale-90 lg:scale-100">
+                  <CardBatalha {...opponentCard} onCardClick={undefined} />
+                  <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                 </div>
-                <div className="w-24 h-36 bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-400 flex items-center justify-center text-sm text-gray-400">
-                  Descarte
+
+                {/* VS */}
+                <div className="flex items-center justify-center">
+                  <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">
+                    VS
+                  </div>
                 </div>
+
+                {/* Carta do Jogador */}
+                <div className="transform scale-90 lg:scale-100">
+                  <CardBatalha {...playerBattleCard} onCardClick={undefined} />
+                  <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
 
         {/* Player Hand */}
-        <div className="player-hand flex justify-center mb-4 relative z-20">
-          {/* Card 1 - Estrangulamento */}
-          <div 
-            className="player-card w-24 h-36 shadow-2xl hover:shadow-indigo-500/50 rounded-xl cursor-pointer select-none mx-[-12px] transition-all duration-300 hover:transform hover:translate-y-[-20px]"
-            data-name="Estrangulamento"
-          >
-            <div className="card-inner relative w-full h-full">
-              <div className="card-back absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700"></div>
-              <div className="card-face absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-red-400/90 text-red-900 flex-col border-2 border-red-300">
-                <div className="text-2xl mb-1">🥋</div>
-                <span className="font-bold text-sm text-center">Estrangulamento</span>
-                <span className="text-xs text-center mt-2">Dano: 3</span>
+        <div className="player-hand flex justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-1 min-h-[140px] sm:min-h-[160px] p-5 top-10">
+          <div className="flex space-x-[-4px] sm:space-x-[-6px]">
+            {playerCards.map((card) => (
+              <div
+                key={card.id}
+                className={`
+                  transition-all duration-300 flex-shrink-0
+                  ${selectedCard === card.id 
+                    ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30' 
+                    : 'hover:transform hover:-translate-y-2 hover:scale-105'
+                  }
+                `}
+              >
+                <CardBatalha {...card} onCardClick={handleCardClick} />
               </div>
-            </div>
+            ))}
           </div>
-
-          {/* Card 2 - Defesa Postural */}
-          <div 
-            className="player-card w-24 h-36 shadow-2xl hover:shadow-indigo-500/50 rounded-xl cursor-pointer select-none mx-[-12px] transition-all duration-300 hover:transform hover:translate-y-[-20px]"
-            data-name="Defesa Postural"
-          >
-            <div className="card-inner relative w-full h-full">
-              <div className="card-back absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700"></div>
-              <div className="card-face absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-blue-300/90 text-blue-900 flex-col border-2 border-blue-300">
-                <div className="text-2xl mb-1">🛡️</div>
-                <span className="font-bold text-sm text-center">Defesa Postural</span>
-                <span className="text-xs text-center mt-2">Defesa: 5</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3 - Raspagem Rápida */}
-          <div 
-            className="player-card w-24 h-36 shadow-2xl hover:shadow-indigo-500/50 rounded-xl cursor-pointer select-none mx-[-12px] transition-all duration-300 hover:transform hover:translate-y-[-20px]"
-            data-name="Raspagem Rápida"
-          >
-            <div className="card-inner relative w-full h-full">
-              <div className="card-back absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700"></div>
-              <div className="card-face absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-green-300/90 text-green-900 flex-col border-2 border-green-300">
-                <div className="text-2xl mb-1">⚡</div>
-                <span className="font-bold text-sm text-center">Raspagem Rápida</span>
-                <span className="text-xs text-center mt-2">Efeito: +1 Ação</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4 - Guarda Fechada */}
-          <div 
-            className="player-card w-24 h-36 shadow-2xl hover:shadow-indigo-500/50 rounded-xl cursor-pointer select-none mx-[-12px] transition-all duration-300 hover:transform hover:translate-y-[-20px]"
-            data-name="Guarda Fechada"
-          >
-            <div className="card-inner relative w-full h-full">
-              <div className="card-back absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700"></div>
-              <div className="card-face absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-yellow-400/90 text-yellow-900 flex-col border-2 border-yellow-300">
-                <div className="text-2xl mb-1">🤝</div>
-                <span className="font-bold text-sm text-center">Guarda Fechada</span>
-                <span className="text-xs text-center mt-2">Bloqueio: 4</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 5 - Bônus de Faixa */}
-          <div 
-            className="player-card w-24 h-36 shadow-2xl hover:shadow-indigo-500/50 rounded-xl cursor-pointer select-none mx-[-12px] transition-all duration-300 hover:transform hover:translate-y-[-20px]"
-            data-name="Bônus de Faixa"
-          >
-            <div className="card-inner relative w-full h-full">
-              <div className="card-back absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700"></div>
-              <div className="card-face absolute w-full h-full flex items-center justify-center rounded-xl p-1 bg-purple-400/90 text-purple-900 flex-col border-2 border-purple-300">
-                <div className="text-2xl mb-1">🏅</div>
-                <span className="font-bold text-sm text-center">Bônus de Faixa</span>
-                <span className="text-xs text-center mt-2">Custo: 1</span>
-              </div>
-            </div>
-          </div>
-
-          <span className="absolute bottom-[-50px] text-lg font-semibold text-indigo-400">
-            VOCÊ - Sua Mão
-          </span>
         </div>
+
+        {/* Info dos Jogadores */}
+        <div className="flex flex-col sm:flex-row justify-between items-center px-1 sm:px-2 relative z-20 gap-1 sm:gap-0">
+          <div className="flex items-center space-x-1 sm:space-x-2 bg-black/50 rounded-xl px-2 py-1 sm:px-3 sm:py-1 border border-white/10 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full border border-amber-300"></div>
+            <div className="flex-1 sm:flex-none ml-1 sm:ml-0">
+              <div className="text-white font-semibold text-[10px] sm:text-xs">Você</div>
+              <div className="text-amber-300 text-[8px] sm:text-[10px]">Roxa</div>
+            </div>
+            <div className="text-white/80 text-[10px] sm:text-xs ml-1 sm:ml-2">HP: 85</div>
+          </div>
+
+          <div className="flex items-center space-x-1 sm:space-x-2 bg-black/50 rounded-xl px-2 py-1 sm:px-3 sm:py-1 border border-white/10 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="text-white/80 text-[10px] sm:text-xs mr-1 sm:mr-2">HP: 80</div>
+            <div className="flex-1 sm:flex-none text-right ml-1 sm:ml-0">
+              <div className="text-white font-semibold text-[10px] sm:text-xs">Oponente</div>
+              <div className="text-blue-300 text-[8px] sm:text-[10px]">Azul</div>
+            </div>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full border border-blue-300"></div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
