@@ -132,7 +132,6 @@ export default function TecnicasPage() {
       )}
 
       {/* Lista de técnicas */}
-      // No seu componente que lista as técnicas
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {tecnicasFiltradas.map((t) => (
           <div key={t.id} className="relative group">
