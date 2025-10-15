@@ -7,8 +7,8 @@ import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constant
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [activeCard, setActiveCard] = useState<string | null>(null);
 
-  // Converter técnicas para o formato do CardBatalha
   const playerCards = TECNICAS.slice(0, 5).map(tecnica => ({
     id: tecnica.id,
     titulo: tecnica.nome,
@@ -23,7 +23,6 @@ export default function ArenaPage() {
     gifUrl: tecnica.gif
   }));
 
-  // Carta do oponente em batalha
   const opponentCard = {
     id: TECNICAS[1].id,
     titulo: TECNICAS[1].nome,
@@ -38,7 +37,6 @@ export default function ArenaPage() {
     gifUrl: TECNICAS[1].gif
   };
 
-  // Carta do jogador em batalha
   const playerBattleCard = {
     id: TECNICAS[3].id,
     titulo: TECNICAS[3].nome,
@@ -55,6 +53,12 @@ export default function ArenaPage() {
 
   const handleCardClick = (cardId: string) => {
     setSelectedCard(cardId);
+  };
+
+  const handleConfirm = () => {
+    setActiveCard(selectedCard);
+    setSelectedCard(null);
+    console.log('Carta selecionada para ir ao centro:', selectedCard);
   };
 
   return (
@@ -160,7 +164,23 @@ export default function ArenaPage() {
               {playerCards
                 .filter((card) => card.id === selectedCard)
                 .map((card) => (
-                  <CardTecnica key={card.id} {...card} />
+                  <div key={card.id}>
+                    <CardTecnica {...card} />
+                    <div className="mt-4 flex justify-center space-x-4">
+                      <button
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
+                        onClick={handleConfirm}
+                      >
+                        Selecionar para o Centro
+                      </button>
+                      <button
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
+                        onClick={() => setSelectedCard(null)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
               ))}
             </div>
           </div>
