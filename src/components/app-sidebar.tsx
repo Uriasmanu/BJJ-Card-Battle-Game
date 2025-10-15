@@ -1,4 +1,4 @@
-import { Calendar, Home, User, Search, Settings, Layers, Sword } from "lucide-react"
+import { Home, User, Settings, Layers } from "lucide-react"
 
 import {
   Sidebar,
@@ -19,7 +19,7 @@ const items = [
   },
   {
     title: "Perfil",
-    url: "/profile",
+    url: "/dashboard/profile",
     icon: User, 
   },
   {
