@@ -2,11 +2,12 @@
 
 import ProfileComponent from "@/components/profileComponent";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 
 
 export default function ProfilePage() {
   const [color, setColor] = useState("white");
+  const router = useRouter();
 
   const gradients: Record<string, string> = {
     gray: "from-gray-200 via-gray-400 to-gray-600",
@@ -100,7 +101,7 @@ export default function ProfilePage() {
               <p className="text-sm text-gray-600 mb-6">Acesse e organize seu conjunto de técnicas e habilidades.</p>
 
 
-              <button className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-bold rounded-xl text-sidebar-dark bg-accent-yellow hover:bg-yellow-500 transition duration-150 shadow-md">
+              <button onClick={() => router.push("/dashboard/tecnicas")}className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-bold rounded-xl text-sidebar-dark bg-accent-yellow bg-yellow-500 shadow-md">
                 <svg className="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10s2.6 1.1 8 0c4.4-1 8-2 8 0 0 2-4 3-8 4-4 1-8 2-8 4v2c0 2 3 3 8 3s8-1 8-3" /></svg>
                 Gerenciar Minhas Tecnicas
               </button>

@@ -1,10 +1,15 @@
+'use client';
+
 import { HandFist } from "lucide-react";
 import Image from "next/image";
 import banner from '../../../public/image/inicial.png'
 import ProfileComponent from "@/components/profileComponent";
+import { useRouter } from "next/navigation";
 
 
 export default function DashboardPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row">
       {/* Conteúdo principal */}
@@ -39,7 +44,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Profile - aparece apenas em telas grandes */}
-      <div className="hidden lg:block w-70 xl:w-76 bg-gray-50 border-l border-gray-200">
+      <div className="hidden lg:flex flex-col w-70 xl:w-76">
         <ProfileComponent
           nome="Maria Santos"
           titulo="Faixa Azul (Intermediário)"
@@ -47,9 +52,10 @@ export default function DashboardPage() {
           progresso={65}
           xpAtual={650}
           xpProximaFaixa={1000}
-          onEditarPerfil={() => console.log('Editar perfil clicado')}
+          onEditarPerfil={() => router.push("/dashboard/profile")}
         />
       </div>
+
     </div>
   );
 }
