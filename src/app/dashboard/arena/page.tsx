@@ -6,15 +6,29 @@ import { useState, useEffect } from 'react';
 import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
 import Placar from '@/components/placar';
 
+type Carta = {
+  id: string;
+  titulo: string;
+  categoria: string;
+  descricao: string;
+  faixa: string;
+  pontos: number;
+  corCategoria: string;
+  dificuldade: string;
+  corDificuldade: string;
+  imagemUrl?: string;
+  gifUrl?: string;
+};
+
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [activeCard, setActiveCard] = useState<string | null>(null);
-  const [playerCards, setPlayerCards] = useState<any[]>([]);
-  const [cpuCards, setCpuCards] = useState<any[]>([]);
-  const [opponentCard, setOpponentCard] = useState<any | null>(null);
+  const [playerCards, setPlayerCards] = useState<Carta[]>([]);
+  const [cpuCards, setCpuCards] = useState<Carta[]>([]);
+  const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
 
-  // Função para embaralhar as cartas
-  const embaralhar = (array: any[]) => {
+  // Função para embaralhar cartas
+  const embaralhar = (array: Carta[]): Carta[] => {
     const novoArray = [...array];
     for (let i = novoArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -23,14 +37,14 @@ export default function ArenaPage() {
     return novoArray;
   };
 
-  // Cria o formato das cartas com base nas TECNICAS
-  const montarCarta = (tecnica: any) => ({
+  // Monta carta do formato TECNICAS
+  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
     id: tecnica.id,
     titulo: tecnica.nome,
     categoria: tecnica.categoria,
     descricao: tecnica.descricao,
     faixa: tecnica.faixa,
-    pontos: tecnica.pontos,
+    pontos: tecnica.pontos ?? 0,
     corCategoria: obterCorCategoria(tecnica.categoria).cor,
     dificuldade: tecnica.dificuldade,
     corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
@@ -38,31 +52,27 @@ export default function ArenaPage() {
     gifUrl: tecnica.gif,
   });
 
-  // Quando o jogo começar → distribui 5 cartas aleatórias pra cada jogador
+  // Distribui 5 cartas para cada jogador no início
   useEffect(() => {
-    const embaralhadas = embaralhar(TECNICAS);
-    const cartasJogador = embaralhadas.slice(0, 5).map(montarCarta);
-    const cartasCPU = embaralhadas.slice(5, 10).map(montarCarta);
-    setPlayerCards(cartasJogador);
-    setCpuCards(cartasCPU);
+    const embaralhadas = embaralhar(TECNICAS.map(montarCarta));
+    setPlayerCards(embaralhadas.slice(0, 5));
+    setCpuCards(embaralhadas.slice(5, 10));
   }, []);
 
   const handleCardClick = (cardId: string) => {
     setSelectedCard(cardId);
   };
 
-  // Quando o jogador confirma sua carta
   const handleConfirm = () => {
     if (!selectedCard) return;
 
-    // Define a carta escolhida pelo jogador
     setActiveCard(selectedCard);
 
-    // CPU escolhe uma carta aleatória do baralho dela
+    // CPU escolhe carta aleatória
     const cpuCardAleatoria = cpuCards[Math.floor(Math.random() * cpuCards.length)];
     setOpponentCard(cpuCardAleatoria);
 
-    // Remove a carta escolhida de cada baralho
+    // Remove cartas escolhidas dos baralhos
     setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
     setCpuCards(prev => prev.filter(c => c.id !== cpuCardAleatoria.id));
 
@@ -70,10 +80,8 @@ export default function ArenaPage() {
     console.log('Você escolheu:', selectedCard, '| CPU escolheu:', cpuCardAleatoria.id);
   };
 
-  // Carta do jogador atual no centro
-  const currentPlayerCard = activeCard
-    ? [...TECNICAS, ...playerCards].map(montarCarta).find(card => card.id === activeCard)
-    : null;
+  // Carta do jogador no centro
+  const currentPlayerCard = activeCard ? playerCards.find(c => c.id === activeCard) || null : null;
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
