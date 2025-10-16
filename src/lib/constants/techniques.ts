@@ -114,6 +114,17 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['fuga-de-quadril'],
     ...getAssetPaths('rolamento-lateral'),
   },
+ {
+    id: 'jacare-banguela',
+    nome: 'Jacare Banguela',
+    categoria: 'queda',
+    dificuldade: 'facil',
+    descricao: 'Técnica de queda utilizando alavanca e controle do quadril',
+    faixa: '( Todas )',
+    defesas: ['defesa-jacare-banguela'],
+    proximosMovimentos: ['montada'],
+    ...getAssetPaths('jacare-banguela'),
+  },
   {
     id: 'fuga-de-quadril',
     nome: 'Fuga de Quadril',
