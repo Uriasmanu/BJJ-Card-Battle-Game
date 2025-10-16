@@ -195,7 +195,7 @@ export default function CardTecnica({
 
         {/* Cabeçalho com título e categoria */}
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-bold text-gray-800 flex-1 mr-2 line-clamp-1">{titulo}</h3>
+          <h3 className="text-lg font-bold text-gray-800 flex-1 mr-2 break-words">{titulo}</h3>
           <span
             className="text-xs font-semibold text-white px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0"
             style={{ backgroundColor: corCategoria }}
@@ -205,7 +205,7 @@ export default function CardTecnica({
         </div>
 
         {/* Descrição */}
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2 flex-grow">{descricao}</p>
+        <p className="text-sm text-gray-600 mb-3 flex-grow whitespace-normal">{descricao}</p>
 
         {/* Metadados - Dificuldade e Faixa */}
         <div className="flex items-center justify-between mb-3">
