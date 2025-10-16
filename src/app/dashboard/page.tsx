@@ -5,10 +5,26 @@ import Image from "next/image";
 import banner from '../../../public/image/inicial.png'
 import ProfileComponent from "@/components/profileComponent";
 import { useRouter } from "next/navigation";
+import { useTimer } from "@/contexts/TimerContext";
+
 
 
 export default function DashboardPage() {
+  const { startTimer } = useTimer();
   const router = useRouter();
+  // Aqui você obteria a faixa real do usuário do contexto de autenticação ou perfil
+  // Por enquanto, vamos simular que pegamos do perfil
+  const getUserBelt = () => {
+    // Em uma aplicação real, isso viria do contexto do usuário
+    // Vamos usar 'blue' como exemplo, mas você pode ajustar conforme sua lógica
+    return 'blue'; // ou 'white', 'purple', etc.
+  };
+
+  const handleStartFight = () => {
+    const userBelt = getUserBelt();
+    startTimer(userBelt); // Inicia o timer com a faixa do usuário
+    router.push("/dashboard/arena");
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row">
@@ -29,7 +45,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="max-w-md mx-auto space-y-6">
-            <button onClick={() => router.push("/dashboard/arena")}  className="w-full py-4 px-6 text-lg font-bold rounded-lg text-gray-900 border-2 border-amber-300 flex items-center justify-center gap-3 bg-amber-300 hover:bg-amber-400 transition-all duration-300">
+            <button onClick={handleStartFight} className="w-full py-4 px-6 text-lg font-bold rounded-lg text-gray-900 border-2 border-amber-300 flex items-center justify-center gap-3 bg-amber-300 hover:bg-amber-400 transition-all duration-300">
               <HandFist className="w-6 h-6" />
               Iniciar Nova Luta
             </button>

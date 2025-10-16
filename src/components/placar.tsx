@@ -1,14 +1,22 @@
+'use client';
+
+import { useTimer } from '@/contexts/TimerContext';
+
 interface PlacarProps {
-  timer?: string;
   leftPlayer?: { name: string; score: number };
   rightPlayer?: { name: string; score: number };
 }
 
 export default function Placar({
-  timer = "05:10",
   leftPlayer = { name: "REINALDO", score: 9 },
   rightPlayer = { name: "RODRIGO", score: 7 },
 }: PlacarProps) {
+  const { 
+    formattedTime, 
+    isRunning, 
+    currentBeltInfo 
+  } = useTimer();
+
   return (
     <div className="relative w-[14rem] max-w-full mx-auto">
       {/* Container geral do placar */}
@@ -34,8 +42,17 @@ export default function Placar({
         </div>
 
         {/* Timer central */}
-        <div className="flex flex-col items-center justify-center bg-gray-100 text-gray-900 px-1 w-14">
-          <span className="text-sm font-semibold">{timer}</span>
+        <div className="flex flex-col items-center justify-center bg-gray-100 text-gray-900 px-1 w-14 relative">
+          <span className={`text-sm font-semibold ${
+            isRunning ? 'text-green-600' : 'text-gray-900'
+          }`}>
+            {formattedTime}
+          </span>
+          
+          {/* Indicador visual do estado do timer */}
+          <div className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${
+            isRunning ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+          }`} />
         </div>
 
         {/* Lado direito */}
@@ -58,6 +75,7 @@ export default function Placar({
         </div>
 
       </div>
+
     </div>
   );
 }
