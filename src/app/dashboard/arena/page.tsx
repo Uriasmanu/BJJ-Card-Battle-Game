@@ -187,27 +187,6 @@ export default function ArenaPage() {
           </div>
         )}
 
-        {/* Info dos Jogadores */}
-        <div className="flex flex-col sm:flex-row justify-between items-center px-1 sm:px-2 relative z-20 gap-1 sm:gap-0">
-          <div className="flex items-center space-x-1 sm:space-x-2 bg-black/50 rounded-xl px-2 py-1 sm:px-3 sm:py-1 border border-white/10 w-full sm:w-auto justify-between sm:justify-start">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full border border-amber-300"></div>
-            <div className="flex-1 sm:flex-none ml-1 sm:ml-0">
-              <div className="text-white font-semibold text-[10px] sm:text-xs">Você</div>
-              <div className="text-amber-300 text-[8px] sm:text-[10px]">Roxa</div>
-            </div>
-            <div className="text-white/80 text-[10px] sm:text-xs ml-1 sm:ml-2">HP: 85</div>
-          </div>
-
-          <div className="flex items-center space-x-1 sm:space-x-2 bg-black/50 rounded-xl px-2 py-1 sm:px-3 sm:py-1 border border-white/10 w-full sm:w-auto justify-between sm:justify-end">
-            <div className="text-white/80 text-[10px] sm:text-xs mr-1 sm:mr-2">HP: 80</div>
-            <div className="flex-1 sm:flex-none text-right ml-1 sm:ml-0">
-              <div className="text-white font-semibold text-[10px] sm:text-xs">Oponente</div>
-              <div className="text-blue-300 text-[8px] sm:text-[10px]">Azul</div>
-            </div>
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full border border-blue-300"></div>
-          </div>
-        </div>
-
       </div>
     </div>
   );
