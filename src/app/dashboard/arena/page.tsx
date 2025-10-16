@@ -1,128 +1,222 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 
+import CardBatalha from '@/components/cardBatalha';
+import CardTecnica from '@/components/cardTecnica';
+import { useState, useEffect } from 'react';
+import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
+import Placar from '@/components/placar';
+
+type Dificuldade = 'facil' | 'intermediario' | 'dificil';
 type Categoria = 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa';
 
-interface Tecnica {
-  id: number;
-  nome: string;
+interface Carta {
+  id: string;
+  titulo: string;
   categoria: Categoria;
-  dificuldade: string;
-  imagem: string;
-  gif: string;
-}
-
-interface Carta extends Tecnica {
+  descricao: string;
+  faixa: string;
+  pontos: number;
+  corCategoria: string;
+  dificuldade: Dificuldade;
   corDificuldade: string;
-  imagemUrl: string;
-  gifUrl: string;
-}
-
-const tecnicasBase: Tecnica[] = [
-  { id: 1, nome: 'Guarda Fechada', categoria: 'guarda', dificuldade: 'fácil', imagem: '/imagens/guarda.jpg', gif: '/gifs/guarda.gif' },
-  { id: 2, nome: 'Passagem de Meia', categoria: 'passagem', dificuldade: 'médio', imagem: '/imagens/passagem.jpg', gif: '/gifs/passagem.gif' },
-  { id: 3, nome: 'Arm Lock', categoria: 'finalizacao', dificuldade: 'difícil', imagem: '/imagens/arm.jpg', gif: '/gifs/arm.gif' },
-  { id: 4, nome: 'Raspagem X', categoria: 'raspagem', dificuldade: 'médio', imagem: '/imagens/raspagem.jpg', gif: '/gifs/raspagem.gif' },
-  { id: 5, nome: 'Queda Ogoshi', categoria: 'queda', dificuldade: 'fácil', imagem: '/imagens/queda.jpg', gif: '/gifs/queda.gif' },
-  { id: 6, nome: 'Defesa de Montada', categoria: 'defesa', dificuldade: 'médio', imagem: '/imagens/defesa.jpg', gif: '/gifs/defesa.gif' },
-  { id: 7, nome: 'Guarda Aranha', categoria: 'guarda', dificuldade: 'difícil', imagem: '/imagens/guarda2.jpg', gif: '/gifs/guarda2.gif' },
-  { id: 8, nome: 'Single Leg', categoria: 'queda', dificuldade: 'médio', imagem: '/imagens/queda2.jpg', gif: '/gifs/queda2.gif' },
-];
-
-function obterCorDificuldade(dificuldade: string) {
-  switch (dificuldade) {
-    case 'fácil':
-      return { cor: 'green' };
-    case 'médio':
-      return { cor: 'orange' };
-    case 'difícil':
-      return { cor: 'red' };
-    default:
-      return { cor: 'gray' };
-  }
+  imagemUrl?: string;
+  gifUrl?: string;
 }
 
 export default function ArenaPage() {
-  const [maoJogador, setMaoJogador] = useState<Carta[]>([]);
-  const [maoCPU, setMaoCPU] = useState<Carta[]>([]);
-  const [primeiraJogada, setPrimeiraJogada] = useState(true);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [activeCard, setActiveCard] = useState<Carta | null>(null);
+  const [playerCards, setPlayerCards] = useState<Carta[]>([]);
+  const [cpuCards, setCpuCards] = useState<Carta[]>([]);
+  const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
 
-  const baralho: Carta[] = tecnicasBase.map((tecnica) => ({
-    ...tecnica,
-    corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
-    imagemUrl: tecnica.imagem,
-    gifUrl: tecnica.gif,
-  }));
-
-  // Distribui 1 carta de cada categoria (6 cartas por jogador)
-  useEffect(() => {
-    const categorias: Categoria[] = ['guarda', 'passagem', 'finalizacao', 'raspagem', 'queda', 'defesa'];
-
-    const gerarMao = (): Carta[] => {
-      return categorias.map((categoria) => {
-        const tecnicasCategoria = baralho.filter((t) => t.categoria === categoria);
-        return tecnicasCategoria[Math.floor(Math.random() * tecnicasCategoria.length)];
-      });
-    };
-
-    setMaoJogador(gerarMao());
-    setMaoCPU(gerarMao());
-  }, []);
-
-  // CPU joga carta
-  const jogadaCPU = (): Carta | null => {
-    if (maoCPU.length === 0) return null;
-
-    let cartaEscolhida: Carta;
-
-    if (primeiraJogada) {
-      const opcoesPrimeira = maoCPU.filter((c) => c.categoria === 'queda' || c.categoria === 'guarda');
-      cartaEscolhida =
-        opcoesPrimeira.length > 0
-          ? opcoesPrimeira[Math.floor(Math.random() * opcoesPrimeira.length)]
-          : maoCPU[Math.floor(Math.random() * maoCPU.length)];
-      setPrimeiraJogada(false);
-    } else {
-      cartaEscolhida = maoCPU[Math.floor(Math.random() * maoCPU.length)];
+  const embaralhar = (array: Carta[]) => {
+    const novoArray = [...array];
+    for (let i = novoArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [novoArray[i], novoArray[j]] = [novoArray[j], novoArray[i]];
     }
-
-    setMaoCPU((prev) => prev.filter((c) => c.id !== cartaEscolhida.id));
-    return cartaEscolhida;
+    return novoArray;
   };
 
-  // Jogador joga carta
-  const jogarCartaJogador = (carta: Carta) => {
-    setMaoJogador((prev) => prev.filter((c) => c.id !== carta.id));
-    const jogada = jogadaCPU();
-    console.log('Jogador jogou:', carta.nome);
-    console.log('CPU jogou:', jogada ? jogada.nome : 'sem carta');
+  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => {
+    return {
+      id: tecnica.id,
+      titulo: tecnica.nome,
+      categoria: tecnica.categoria as Categoria,
+      descricao: tecnica.descricao,
+      faixa: tecnica.faixa,
+      pontos: tecnica.pontos ?? 0,
+      corCategoria: obterCorCategoria(tecnica.categoria).cor,
+      dificuldade: tecnica.dificuldade as Dificuldade,
+      corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
+      imagemUrl: tecnica.imagem,
+      gifUrl: tecnica.gif,
+    };
+  };
+
+  useEffect(() => {
+    const cartasTodas = TECNICAS.map(montarCarta);
+    const categorias: Categoria[] = ['guarda', 'passagem', 'finalizacao', 'raspagem', 'queda', 'defesa'];
+
+    const player: Carta[] = [];
+    const cpu: Carta[] = [];
+
+    categorias.forEach(categoria => {
+      const cartasCategoria = cartasTodas.filter(c => c.categoria === categoria);
+      const embaralhadas = embaralhar(cartasCategoria);
+
+      const cartaPlayer = embaralhadas[0];
+      const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : embaralhadas[0];
+
+      player.push(cartaPlayer);
+      cpu.push(cartaCpu);
+    });
+
+    setPlayerCards(player);
+    setCpuCards(cpu);
+  }, []);
+
+  const handleCardClick = (cardId: string) => {
+    if (activeCard) return;
+    setSelectedCard(cardId);
+  };
+
+  const handleConfirm = () => {
+    if (!selectedCard || playerCards.length === 0 || cpuCards.length === 0) return;
+
+    const cartaSelecionada = playerCards.find(c => c.id === selectedCard);
+    if (!cartaSelecionada) return;
+
+    setActiveCard(cartaSelecionada);
+
+    const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+    setOpponentCard(cpuCarta);
+
+    setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
+    setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
+
+    setSelectedCard(null);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1 className="text-2xl font-bold mb-4">BJJ Card Battle</h1>
-      <h2 className="text-lg mb-2">Suas Cartas</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-        {maoJogador.map((carta) => (
-          <div
-            key={carta.id}
-            style={{
-              border: `2px solid ${carta.corDificuldade}`,
-              borderRadius: '12px',
-              padding: '10px',
-              width: '140px',
-              textAlign: 'center',
-              cursor: 'pointer',
-              background: '#1a1a1a',
-              color: '#fff',
-            }}
-            onClick={() => jogarCartaJogador(carta)}
-          >
-            <img src={carta.imagemUrl} alt={carta.nome} style={{ width: '100%', borderRadius: '8px' }} />
-            <h3>{carta.nome}</h3>
-            <p>{carta.categoria}</p>
+    <div className="min-h-screen bg-white relative overflow-x-hidden">
+      {/* Tatame */}
+      <div className="absolute inset-0 flex items-center justify-center z-0">
+        <div className="relative w-[95vmin] max-w-[900px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center -translate-y-10 sm:translate-y-0">
+          <div className="absolute inset-[10%] bg-blue-600 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="relative z-10 flex flex-col min-h-screen justify-between p-1 sm:p-2">
+        {/* Opponent Hand */}
+        <div className="opponent-hand flex justify-center mt-1 sm:mt-2 relative z-20 overflow-x-auto">
+          <div className="flex space-x-[-8px] sm:space-x-[-12px] px-1">
+            {cpuCards.map((_, index) => (
+              <div
+                key={index}
+                className="w-10 h-14 sm:w-12 sm:h-16 bg-slate-900 shadow-lg rounded-md cursor-default opacity-90 flex-shrink-0"
+                style={{ transform: `rotateZ(${-8 + index * 4}deg)` }}
+              >
+                <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-md border border-gray-700"></div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Área Central */}
+        <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
+            <Placar />
+          </div>
+
+          <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
+            <div className="rounded-xl p-4 sm:p-6 border border-white/10">
+              <div className="flex justify-center items-center space-x-4">
+                {opponentCard && (
+                  <div className="transform scale-90 lg:scale-100">
+                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes={true} />
+                    <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
+                  </div>
+                )}
+
+                {activeCard && opponentCard && (
+                  <div className="flex items-center justify-center">
+                    <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">
+                      VS
+                    </div>
+                  </div>
+                )}
+
+                {activeCard && (
+                  <div className="transform scale-90 lg:scale-100">
+                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes={true} />
+                    <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Player Hand */}
+        <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
+          <div className="flex space-x-2 sm:space-x-4">
+            {playerCards.map(card => (
+              <div
+                key={card.id}
+                className={`transition-all duration-300 flex-shrink-0 ${
+                  selectedCard === card.id
+                    ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
+                    : 'hover:transform hover:-translate-y-2 hover:scale-105'
+                }`}
+              >
+                <CardBatalha {...card} onCardClick={handleCardClick} mostrarInformacoes={true} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Modal da carta selecionada */}
+        {selectedCard && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedCard(null)}
+          >
+            <div
+              className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                className="absolute top-3 right-3 text-white font-bold text-xl"
+                onClick={() => setSelectedCard(null)}
+              >
+                ×
+              </button>
+
+              {playerCards.find(card => card.id === selectedCard) && (
+                <div>
+                  <CardTecnica {...playerCards.find(card => card.id === selectedCard)!} />
+                  <div className="mt-4 flex justify-center space-x-4">
+                    <button
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
+                      onClick={handleConfirm}
+                    >
+                      Selecionar para o Centro
+                    </button>
+                    <button
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
+                      onClick={() => setSelectedCard(null)}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
