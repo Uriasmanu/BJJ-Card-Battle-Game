@@ -82,9 +82,10 @@ export default function ArenaPage() {
     console.log('Você escolheu:', selectedCard, '| CPU escolheu:', cpuCarta.id);
   };
 
+  // Nenhuma carta aparece no centro até ser selecionada
   const currentPlayerCard = activeCard
-    ? playerCards.find(card => card.id === activeCard) || playerCards[0]
-    : playerCards[0];
+    ? playerCards.find(card => card.id === activeCard)
+    : null;
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
