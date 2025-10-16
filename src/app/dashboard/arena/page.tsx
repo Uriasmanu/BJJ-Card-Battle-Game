@@ -157,7 +157,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Player Hand */}
-        <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-10 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
+        <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
           <div className="flex space-x-2 sm:space-x-4">
             {playerCards.map(card => (
               <div
