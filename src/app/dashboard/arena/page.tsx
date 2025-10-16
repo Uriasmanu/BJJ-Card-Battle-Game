@@ -24,7 +24,7 @@ interface Carta {
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
-  const [activeCard, setActiveCard] = useState<string | null>(null);
+  const [activeCard, setActiveCard] = useState<Carta | null>(null);
   const [playerCards, setPlayerCards] = useState<Carta[]>([]);
   const [cpuCards, setCpuCards] = useState<Carta[]>([]);
   const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
@@ -68,7 +68,11 @@ export default function ArenaPage() {
   const handleConfirm = () => {
     if (!selectedCard || playerCards.length === 0 || cpuCards.length === 0) return;
 
-    setActiveCard(selectedCard);
+    // Encontra a carta selecionada
+    const cartaSelecionada = playerCards.find(c => c.id === selectedCard);
+    if (!cartaSelecionada) return;
+
+    setActiveCard(cartaSelecionada); // Guarda a carta inteira
 
     // CPU escolhe carta aleatória
     const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
@@ -79,13 +83,7 @@ export default function ArenaPage() {
     setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
 
     setSelectedCard(null);
-    console.log('Você escolheu:', selectedCard, '| CPU escolheu:', cpuCarta.id);
   };
-
-  // Nenhuma carta aparece no centro até ser selecionada
-  const currentPlayerCard = activeCard
-    ? playerCards.find(card => card.id === activeCard)
-    : null;
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
@@ -135,17 +133,19 @@ export default function ArenaPage() {
                 )}
 
                 {/* VS */}
-                <div className="flex items-center justify-center">
-                  <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">
-                    VS
+                {activeCard && opponentCard && (
+                  <div className="flex items-center justify-center">
+                    <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">
+                      VS
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Carta do Jogador */}
-                {currentPlayerCard && (
+                {activeCard && (
                   <div className="transform scale-90 lg:scale-100">
                     <CardBatalha
-                      {...currentPlayerCard}
+                      {...activeCard}
                       onCardClick={undefined}
                       mostrarInformacoes={false}
                     />
