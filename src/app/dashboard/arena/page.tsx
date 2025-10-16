@@ -55,7 +55,6 @@ export default function ArenaPage() {
     };
   };
 
-  // Distribuição inicial: 1 carta por categoria (6 cartas por jogador)
   useEffect(() => {
     const cartasTodas = TECNICAS.map(montarCarta);
     const categorias: Categoria[] = ['guarda', 'passagem', 'finalizacao', 'raspagem', 'queda', 'defesa'];
@@ -196,8 +195,7 @@ export default function ArenaPage() {
                 ×
               </button>
 
-              {playerCards
-                .find(card => card.id === selectedCard) && (
+              {playerCards.find(card => card.id === selectedCard) && (
                 <div>
                   <CardTecnica {...playerCards.find(card => card.id === selectedCard)!} />
                   <div className="mt-4 flex justify-center space-x-4">
@@ -216,3 +214,10 @@ export default function ArenaPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
