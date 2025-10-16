@@ -11,7 +11,10 @@ export default function TecnicasPage() {
   const [tecnicaSelecionada, setTecnicaSelecionada] = useState<string>("");
   const [busca, setBusca] = useState("");
   const [filtroFaixa, setFiltroFaixa] = useState("todas");
-  const [filtroCategoria, setFiltroCategoria] = useState("todas"); // ← filtro categoria
+  const [filtroCategoria, setFiltroCategoria] = useState("todas");
+
+  // Pegar categorias únicas do array TECNICAS
+  const categoriasDisponiveis = Array.from(new Set(TECNICAS.map(t => t.categoria)));
 
   // Filtrar técnicas baseado na busca, faixa e categoria
   const tecnicasFiltradas = tecnicas.filter((tecnica) => {
@@ -112,7 +115,7 @@ export default function TecnicasPage() {
             </select>
           </div>
 
-          {/* Filtro de categoria */}
+          {/* Filtro de categoria dinâmico */}
           <div className="relative w-full md:w-40">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <select
@@ -121,9 +124,11 @@ export default function TecnicasPage() {
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-white w-full focus:ring-yellow-500 focus:border-yellow-500 transition appearance-none"
             >
               <option value="todas">Todas as Categorias</option>
-              <option value="ataque">Ataque</option>
-              <option value="defesa">Defesa</option>
-              <option value="finalizacao">Finalização</option>
+              {categoriasDisponiveis.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
