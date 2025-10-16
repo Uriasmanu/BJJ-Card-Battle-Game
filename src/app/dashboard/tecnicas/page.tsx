@@ -11,14 +11,19 @@ export default function TecnicasPage() {
   const [tecnicaSelecionada, setTecnicaSelecionada] = useState<string>("");
   const [busca, setBusca] = useState("");
   const [filtroFaixa, setFiltroFaixa] = useState("todas");
+  const [filtroCategoria, setFiltroCategoria] = useState("todas"); // ← filtro categoria
 
-  // Filtrar técnicas baseado na busca e filtro
+  // Filtrar técnicas baseado na busca, faixa e categoria
   const tecnicasFiltradas = tecnicas.filter((tecnica) => {
-    const matchesBusca = tecnica.nome.toLowerCase().includes(busca.toLowerCase()) ||
+    const matchesBusca =
+      tecnica.nome.toLowerCase().includes(busca.toLowerCase()) ||
       tecnica.descricao.toLowerCase().includes(busca.toLowerCase());
-    const matchesFaixa = filtroFaixa === "todas" || tecnica.faixa === filtroFaixa.toLowerCase();
+    const matchesFaixa =
+      filtroFaixa === "todas" || tecnica.faixa === filtroFaixa.toLowerCase();
+    const matchesCategoria =
+      filtroCategoria === "todas" || tecnica.categoria === filtroCategoria.toLowerCase();
 
-    return matchesBusca && matchesFaixa;
+    return matchesBusca && matchesFaixa && matchesCategoria;
   });
 
   const handleAdd = () => {
@@ -27,7 +32,6 @@ export default function TecnicasPage() {
     const encontrada = TECNICAS.find((t) => t.id === tecnicaSelecionada);
     if (!encontrada) return;
 
-    // Verifica se a técnica já existe no deck
     const jaExiste = tecnicas.some(t => t.id === encontrada.id);
     if (jaExiste) {
       alert("Esta técnica já está no seu deck!");
@@ -45,8 +49,7 @@ export default function TecnicasPage() {
     setTecnicas(prev => prev.filter(t => t.id !== id));
   };
 
-  // Calcular estatísticas - CORREÇÃO AQUI
-  const totalPontos = tecnicas.reduce((sum, t) => sum + (t.pontos || 0), 0); // ← Adicione (t.pontos || 0)
+  const totalPontos = tecnicas.reduce((sum, t) => sum + (t.pontos || 0), 0);
   const totalFinalizacoes = tecnicas.filter(t => t.categoria === 'finalizacao').length;
 
   return (
@@ -80,6 +83,7 @@ export default function TecnicasPage() {
 
         {/* Buscar, filtrar e adicionar */}
         <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          {/* Busca */}
           <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -91,6 +95,7 @@ export default function TecnicasPage() {
             />
           </div>
 
+          {/* Filtro de faixa */}
           <div className="relative w-full md:w-40">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <select
@@ -104,6 +109,21 @@ export default function TecnicasPage() {
               <option value="roxa">Roxa</option>
               <option value="marrom">Marrom</option>
               <option value="preta">Preta</option>
+            </select>
+          </div>
+
+          {/* Filtro de categoria */}
+          <div className="relative w-full md:w-40">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <select
+              value={filtroCategoria}
+              onChange={(e) => setFiltroCategoria(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-white w-full focus:ring-yellow-500 focus:border-yellow-500 transition appearance-none"
+            >
+              <option value="todas">Todas as Categorias</option>
+              <option value="ataque">Ataque</option>
+              <option value="defesa">Defesa</option>
+              <option value="finalizacao">Finalização</option>
             </select>
           </div>
 
@@ -145,15 +165,14 @@ export default function TecnicasPage() {
               corCategoria={obterCorCategoria(t.categoria).cor}
               dificuldade={
                 t.dificuldade === 'facil' ? 'facil' :
-                  t.dificuldade === 'intermediario' ? 'intermediario' :
-                    'dificil'
+                t.dificuldade === 'intermediario' ? 'intermediario' :
+                'dificil'
               }
               corDificuldade={obterCorDificuldade(t.dificuldade).cor}
               imagemUrl={t.imagem}
-              gifUrl={t.gif} // ← Nova prop para o GIF
+              gifUrl={t.gif}
               onCardClick={(id) => console.log('Técnica clicada:', id)}
             />
-            {/* Botão de remover */}
             <button
               onClick={() => handleRemoverTecnica(t.id)}
               className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
@@ -167,7 +186,7 @@ export default function TecnicasPage() {
         ))}
       </div>
 
-      {/* Modal: selecionar técnica existente */}
+      {/* Modal */}
       {mostrarModal && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
@@ -189,15 +208,14 @@ export default function TecnicasPage() {
                 onChange={(e) => setTecnicaSelecionada(e.target.value)}
               >
                 <option value="">-- Escolha uma técnica --</option>
-                {TECNICAS.filter(t => !tecnicas.some(deckT => deckT.id === t.id)) // Não mostrar técnicas já adicionadas
+                {TECNICAS.filter(t => !tecnicas.some(deckT => deckT.id === t.id))
                   .map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.nome} — Faixa {t.faixa.charAt(0).toUpperCase() + t.faixa.slice(1)} ({t.pontos ? `${t.pontos} pts` : 'Finalização'}) {/* ← CORREÇÃO AQUI */}
+                      {t.nome} — Faixa {t.faixa.charAt(0).toUpperCase() + t.faixa.slice(1)} ({t.pontos ? `${t.pontos} pts` : 'Finalização'})
                     </option>
                   ))}
               </select>
 
-              {/* Prévia da técnica selecionada */}
               {tecnicaSelecionada && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
                   <h3 className="font-semibold text-gray-800 mb-2">Prévia:</h3>
@@ -208,7 +226,7 @@ export default function TecnicasPage() {
                         <p><strong>Nome:</strong> {tecnica.nome}</p>
                         <p><strong>Categoria:</strong> {tecnica.categoria}</p>
                         <p><strong>Dificuldade:</strong> {tecnica.dificuldade}</p>
-                        <p><strong>Pontos:</strong> {tecnica.pontos ? `${tecnica.pontos} pts` : 'Finalização'}</p> {/* ← CORREÇÃO AQUI */}
+                        <p><strong>Pontos:</strong> {tecnica.pontos ? `${tecnica.pontos} pts` : 'Finalização'}</p>
                       </div>
                     ) : null;
                   })()}
