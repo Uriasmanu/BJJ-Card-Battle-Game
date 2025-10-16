@@ -7,11 +7,12 @@ import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constant
 import Placar from '@/components/placar';
 
 type Dificuldade = 'facil' | 'intermediario' | 'dificil';
+type Categoria = 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa';
 
 interface Carta {
   id: string;
   titulo: string;
-  categoria: string;
+  categoria: Categoria;
   descricao: string;
   faixa: string;
   pontos: number;
@@ -41,7 +42,7 @@ export default function ArenaPage() {
   const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
     id: tecnica.id,
     titulo: tecnica.nome,
-    categoria: tecnica.categoria,
+    categoria: tecnica.categoria as Categoria,
     descricao: tecnica.descricao,
     faixa: tecnica.faixa,
     pontos: tecnica.pontos ?? 0,
@@ -52,38 +53,25 @@ export default function ArenaPage() {
     gifUrl: tecnica.gif
   }));
 
-  // Distribuição inicial de cartas: 1 por categoria
+  // Distribuição inicial: 1 carta por categoria (6 cartas por jogador)
   useEffect(() => {
     const cartasTodas = TECNICAS.map(montarCarta);
-    const categoriasUnicas = Array.from(new Set(cartasTodas.map(c => c.categoria)));
+    const categorias: Categoria[] = ['guarda', 'passagem', 'finalizacao', 'raspagem', 'queda', 'defesa'];
 
     const player: Carta[] = [];
     const cpu: Carta[] = [];
 
-    categoriasUnicas.forEach(categoria => {
+    categorias.forEach(categoria => {
       const cartasCategoria = cartasTodas.filter(c => c.categoria === categoria);
       const embaralhadas = embaralhar(cartasCategoria);
 
-      // Uma carta aleatória por categoria para cada jogador
+      // Carta para jogador e CPU
       const cartaPlayer = embaralhadas[0];
       const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : embaralhadas[0];
 
       player.push(cartaPlayer);
       cpu.push(cartaCpu);
     });
-
-    // Remover cartas já distribuídas
-    const idsDistribuidos = [...player, ...cpu].map(c => c.id);
-    const restantes = cartasTodas.filter(c => !idsDistribuidos.includes(c.id));
-    const embaralhadasRestantes = embaralhar(restantes);
-
-    // Preencher mãos até 5 cartas
-    while (player.length < 5 && embaralhadasRestantes.length > 0) {
-      player.push(embaralhadasRestantes.pop()!);
-    }
-    while (cpu.length < 5 && embaralhadasRestantes.length > 0) {
-      cpu.push(embaralhadasRestantes.pop()!);
-    }
 
     setPlayerCards(player);
     setCpuCards(cpu);
