@@ -46,7 +46,7 @@ export default function ArenaPage() {
     categoria: tecnica.categoria,
     descricao: tecnica.descricao,
     faixa: tecnica.faixa,
-    pontos: tecnica.pontos,
+    pontos?: tecnica.pontos,
     corCategoria: obterCorCategoria(tecnica.categoria).cor,
     dificuldade: tecnica.dificuldade as Dificuldade,
     corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
