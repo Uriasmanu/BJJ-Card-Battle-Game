@@ -25,11 +25,10 @@ interface Carta {
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
-  const [activeCard, setActiveCard] = useState<Carta | null>(null);
   const [playerCards, setPlayerCards] = useState<Carta[]>([]);
   const [cpuCards, setCpuCards] = useState<Carta[]>([]);
-  const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
-  const [turno, setTurno] = useState<number>(1); // novo controle de turno
+  const [batalhas, setBatalhas] = useState<{ player: Carta; cpu: Carta }[]>([]);
+  const [turno, setTurno] = useState<number>(1);
 
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
@@ -40,21 +39,19 @@ export default function ArenaPage() {
     return novoArray;
   };
 
-  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => {
-    return {
-      id: tecnica.id,
-      titulo: tecnica.nome,
-      categoria: tecnica.categoria as Categoria,
-      descricao: tecnica.descricao,
-      faixa: tecnica.faixa,
-      pontos: tecnica.pontos ?? 0,
-      corCategoria: obterCorCategoria(tecnica.categoria).cor,
-      dificuldade: tecnica.dificuldade as Dificuldade,
-      corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
-      imagemUrl: tecnica.imagem,
-      gifUrl: tecnica.gif,
-    };
-  };
+  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
+    id: tecnica.id,
+    titulo: tecnica.nome,
+    categoria: tecnica.categoria as Categoria,
+    descricao: tecnica.descricao,
+    faixa: tecnica.faixa,
+    pontos: tecnica.pontos ?? 0,
+    corCategoria: obterCorCategoria(tecnica.categoria).cor,
+    dificuldade: tecnica.dificuldade as Dificuldade,
+    corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
+    imagemUrl: tecnica.imagem,
+    gifUrl: tecnica.gif,
+  });
 
   useEffect(() => {
     const cartasTodas = TECNICAS.map(montarCarta);
@@ -79,8 +76,7 @@ export default function ArenaPage() {
   }, []);
 
   const handleCardClick = (cardId: string) => {
-    if (activeCard) return;
-    setSelectedCard(cardId);
+    if (!selectedCard) setSelectedCard(cardId);
   };
 
   const handleConfirm = () => {
@@ -89,32 +85,26 @@ export default function ArenaPage() {
     const cartaSelecionada = playerCards.find(c => c.id === selectedCard);
     if (!cartaSelecionada) return;
 
-    setActiveCard(cartaSelecionada);
-
-    let cpuCarta: Carta | undefined;
-
-    // 🧠 Primeira jogada: CPU escolhe apenas "queda" ou "guarda"
+    // Escolha da CPU
+    let cpuCarta: Carta;
     if (turno === 1) {
       const opcoesCpu = cpuCards.filter(c => c.categoria === 'queda' || c.categoria === 'guarda');
-      if (opcoesCpu.length > 0) {
-        cpuCarta = opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)];
-      } else {
-        // fallback caso não tenha essas cartas
-        cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
-      }
+      cpuCarta = opcoesCpu.length > 0
+        ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
+        : cpuCards[Math.floor(Math.random() * cpuCards.length)];
     } else {
-      // Jogadas seguintes: escolha aleatória normal
       cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
     }
 
-    if (!cpuCarta) return;
-
-    setOpponentCard(cpuCarta);
+    // Atualiza cartas do jogador e CPU
     setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
-    setCpuCards(prev => prev.filter(c => c.id !== cpuCarta!.id));
+    setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
+
+    // Adiciona a batalha ao histórico
+    setBatalhas(prev => [...prev, { player: cartaSelecionada, cpu: cpuCarta }]);
 
     setSelectedCard(null);
-    setTurno(prev => prev + 1); // avança turno
+    setTurno(prev => prev + 1);
   };
 
   return (
@@ -144,38 +134,24 @@ export default function ArenaPage() {
         </div>
 
         {/* Área Central */}
-        <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
+        <div className="flex-1 flex flex-col items-center justify-center relative z-20 top-8 lg:top-0 space-y-4">
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
             <Placar />
           </div>
 
-          <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
-            <div className="rounded-xl p-4 sm:p-6 border border-white/10">
-              <div className="flex justify-center items-center space-x-4">
-                {opponentCard && (
-                  <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes={true} />
-                    <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
-                  </div>
-                )}
-
-                {activeCard && opponentCard && (
-                  <div className="flex items-center justify-center">
-                    <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">
-                      VS
-                    </div>
-                  </div>
-                )}
-
-                {activeCard && (
-                  <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes={true} />
-                    <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
-                  </div>
-                )}
+          {batalhas.map((batalha, index) => (
+            <div key={index} className="flex justify-center items-center space-x-4">
+              <div className="transform scale-90 lg:scale-100">
+                <CardBatalha {...batalha.cpu} onCardClick={undefined} mostrarInformacoes={true} />
+                <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
+              </div>
+              <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">VS</div>
+              <div className="transform scale-90 lg:scale-100">
+                <CardBatalha {...batalha.player} onCardClick={undefined} mostrarInformacoes={true} />
+                <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
 
         {/* Player Hand */}
