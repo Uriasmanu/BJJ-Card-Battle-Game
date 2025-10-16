@@ -147,7 +147,7 @@ export default function ArenaPage() {
                     <CardBatalha
                       {...activeCard}
                       onCardClick={undefined}
-                      mostrarInformacoes={false}
+                      mostrarInformacoes={true}
                     />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
                   </div>
