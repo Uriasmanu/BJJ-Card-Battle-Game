@@ -50,7 +50,7 @@ export default function ArenaPage() {
     dificuldade: tecnica.dificuldade as Dificuldade,
     corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
     imagemUrl: tecnica.imagem,
-    gifUrl: tecnica.gif
+    gifUrl: tecnica.gif,
   }));
 
   // Distribuição inicial: 1 carta por categoria (6 cartas por jogador)
