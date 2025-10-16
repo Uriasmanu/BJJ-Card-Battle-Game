@@ -29,6 +29,7 @@ export default function ArenaPage() {
   const [playerCards, setPlayerCards] = useState<Carta[]>([]);
   const [cpuCards, setCpuCards] = useState<Carta[]>([]);
   const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
+  const [turno, setTurno] = useState<number>(1); // novo controle de turno
 
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
@@ -90,13 +91,30 @@ export default function ArenaPage() {
 
     setActiveCard(cartaSelecionada);
 
-    const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
-    setOpponentCard(cpuCarta);
+    let cpuCarta: Carta | undefined;
 
+    // 🧠 Primeira jogada: CPU escolhe apenas "queda" ou "guarda"
+    if (turno === 1) {
+      const opcoesCpu = cpuCards.filter(c => c.categoria === 'queda' || c.categoria === 'guarda');
+      if (opcoesCpu.length > 0) {
+        cpuCarta = opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)];
+      } else {
+        // fallback caso não tenha essas cartas
+        cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      }
+    } else {
+      // Jogadas seguintes: escolha aleatória normal
+      cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+    }
+
+    if (!cpuCarta) return;
+
+    setOpponentCard(cpuCarta);
     setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
-    setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
+    setCpuCards(prev => prev.filter(c => c.id !== cpuCarta!.id));
 
     setSelectedCard(null);
+    setTurno(prev => prev + 1); // avança turno
   };
 
   return (
