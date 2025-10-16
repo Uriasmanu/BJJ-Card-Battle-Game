@@ -29,6 +29,7 @@ export default function ArenaPage() {
   const [playerCards, setPlayerCards] = useState<Carta[]>([]);
   const [cpuCards, setCpuCards] = useState<Carta[]>([]);
   const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
+  const [turno, setTurno] = useState(1);
 
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
@@ -39,22 +40,21 @@ export default function ArenaPage() {
     return novoArray;
   };
 
-  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => {
-    return {
-      id: tecnica.id,
-      titulo: tecnica.nome,
-      categoria: tecnica.categoria as Categoria,
-      descricao: tecnica.descricao,
-      faixa: tecnica.faixa,
-      pontos: tecnica.pontos ?? 0,
-      corCategoria: obterCorCategoria(tecnica.categoria).cor,
-      dificuldade: tecnica.dificuldade as Dificuldade,
-      corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
-      imagemUrl: tecnica.imagem,
-      gifUrl: tecnica.gif,
-    };
-  };
+  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
+    id: tecnica.id,
+    titulo: tecnica.nome,
+    categoria: tecnica.categoria as Categoria,
+    descricao: tecnica.descricao,
+    faixa: tecnica.faixa,
+    pontos: tecnica.pontos ?? 0,
+    corCategoria: obterCorCategoria(tecnica.categoria).cor,
+    dificuldade: tecnica.dificuldade as Dificuldade,
+    corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
+    imagemUrl: tecnica.imagem,
+    gifUrl: tecnica.gif,
+  }));
 
+  // Distribuição inicial: 1 carta por categoria (6 cartas por jogador)
   useEffect(() => {
     const cartasTodas = TECNICAS.map(montarCarta);
     const categorias: Categoria[] = ['guarda', 'passagem', 'finalizacao', 'raspagem', 'queda', 'defesa'];
@@ -82,6 +82,17 @@ export default function ArenaPage() {
     setSelectedCard(cardId);
   };
 
+  const escolherCartaCpu = (cartasCpu: Carta[]): Carta => {
+    // Primeira jogada: tenta escolher "queda" ou "guarda"
+    if (turno === 1) {
+      const prioridade = cartasCpu.find(c => c.categoria === 'queda') || cartasCpu.find(c => c.categoria === 'guarda');
+      if (prioridade) return prioridade;
+    }
+
+    // Caso contrário, escolhe aleatoriamente
+    return cartasCpu[Math.floor(Math.random() * cartasCpu.length)];
+  };
+
   const handleConfirm = () => {
     if (!selectedCard || playerCards.length === 0 || cpuCards.length === 0) return;
 
@@ -90,13 +101,17 @@ export default function ArenaPage() {
 
     setActiveCard(cartaSelecionada);
 
-    const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+    // CPU escolhe carta
+    const cpuCarta = escolherCartaCpu(cpuCards);
     setOpponentCard(cpuCarta);
 
+    // Remove as cartas usadas
     setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
     setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
 
+    // Reset e avança turno
     setSelectedCard(null);
+    setTurno(prev => prev + 1);
   };
 
   return (
