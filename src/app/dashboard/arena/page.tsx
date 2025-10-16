@@ -151,8 +151,9 @@ export default function ArenaPage() {
           >
             <div
               className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()} // evita fechar ao clicar dentro
             >
+              {/* Botão de fechar */}
               <button
                 className="absolute top-3 right-3 text-white font-bold text-xl"
                 onClick={() => setSelectedCard(null)}
@@ -160,11 +161,12 @@ export default function ArenaPage() {
                 ×
               </button>
 
+              {/* Carta detalhada */}
               {playerCards
                 .filter((card) => card.id === selectedCard)
                 .map((card) => (
                   <div key={card.id}>
-                    <CardBatalha {...card} onCardClick={undefined} mostrarInformacoes={true} />
+                    <CardTecnica {...card} />
                     <div className="mt-4 flex justify-center space-x-4">
                       <button
                         className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
