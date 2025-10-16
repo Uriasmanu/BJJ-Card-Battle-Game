@@ -29,7 +29,6 @@ export default function ArenaPage() {
   const [cpuCards, setCpuCards] = useState<Carta[]>([]);
   const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
 
-  // Embaralhar cartas
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
     for (let i = novoArray.length - 1; i > 0; i--) {
@@ -39,7 +38,6 @@ export default function ArenaPage() {
     return novoArray;
   };
 
-  // Converte TECNICAS para cartas
   const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
     id: tecnica.id,
     titulo: tecnica.nome,
@@ -52,33 +50,61 @@ export default function ArenaPage() {
     corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
     imagemUrl: tecnica.imagem,
     gifUrl: tecnica.gif
-  });
+  }));
 
-  // Distribuir 5 cartas aleatórias para cada jogador no início
+  // Distribuição inicial de cartas: 1 por categoria
   useEffect(() => {
-    const embaralhadas = embaralhar(TECNICAS.map(montarCarta));
-    setPlayerCards(embaralhadas.slice(0, 5));
-    setCpuCards(embaralhadas.slice(5, 10));
+    const cartasTodas = TECNICAS.map(montarCarta);
+    const categoriasUnicas = Array.from(new Set(cartasTodas.map(c => c.categoria)));
+
+    const player: Carta[] = [];
+    const cpu: Carta[] = [];
+
+    categoriasUnicas.forEach(categoria => {
+      const cartasCategoria = cartasTodas.filter(c => c.categoria === categoria);
+      const embaralhadas = embaralhar(cartasCategoria);
+
+      // Uma carta aleatória por categoria para cada jogador
+      const cartaPlayer = embaralhadas[0];
+      const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : embaralhadas[0];
+
+      player.push(cartaPlayer);
+      cpu.push(cartaCpu);
+    });
+
+    // Remover cartas já distribuídas
+    const idsDistribuidos = [...player, ...cpu].map(c => c.id);
+    const restantes = cartasTodas.filter(c => !idsDistribuidos.includes(c.id));
+    const embaralhadasRestantes = embaralhar(restantes);
+
+    // Preencher mãos até 5 cartas
+    while (player.length < 5 && embaralhadasRestantes.length > 0) {
+      player.push(embaralhadasRestantes.pop()!);
+    }
+    while (cpu.length < 5 && embaralhadasRestantes.length > 0) {
+      cpu.push(embaralhadasRestantes.pop()!);
+    }
+
+    setPlayerCards(player);
+    setCpuCards(cpu);
   }, []);
 
   const handleCardClick = (cardId: string) => {
+    if (activeCard) return; // bloqueia seleção durante batalha
     setSelectedCard(cardId);
   };
 
   const handleConfirm = () => {
     if (!selectedCard || playerCards.length === 0 || cpuCards.length === 0) return;
 
-    // Encontra a carta selecionada
     const cartaSelecionada = playerCards.find(c => c.id === selectedCard);
     if (!cartaSelecionada) return;
 
-    setActiveCard(cartaSelecionada); // Guarda a carta inteira
+    setActiveCard(cartaSelecionada);
 
-    // CPU escolhe carta aleatória
     const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
     setOpponentCard(cpuCarta);
 
-    // Remove cartas usadas
     setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
     setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
 
@@ -120,19 +146,13 @@ export default function ArenaPage() {
           <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
             <div className="rounded-xl p-4 sm:p-6 border border-white/10">
               <div className="flex justify-center items-center space-x-4">
-                {/* Carta do Oponente */}
                 {opponentCard && (
                   <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha
-                      {...opponentCard}
-                      onCardClick={undefined}
-                      mostrarInformacoes={true}
-                    />
+                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes={true} />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                   </div>
                 )}
 
-                {/* VS */}
                 {activeCard && opponentCard && (
                   <div className="flex items-center justify-center">
                     <div className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm lg:text-base">
@@ -141,14 +161,9 @@ export default function ArenaPage() {
                   </div>
                 )}
 
-                {/* Carta do Jogador */}
                 {activeCard && (
                   <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha
-                      {...activeCard}
-                      onCardClick={undefined}
-                      mostrarInformacoes={true}
-                    />
+                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes={true} />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
                   </div>
                 )}
@@ -193,26 +208,25 @@ export default function ArenaPage() {
               </button>
 
               {playerCards
-                .filter(card => card.id === selectedCard)
-                .map(card => (
-                  <div key={card.id}>
-                    <CardTecnica {...card} />
-                    <div className="mt-4 flex justify-center space-x-4">
-                      <button
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
-                        onClick={handleConfirm}
-                      >
-                        Selecionar para o Centro
-                      </button>
-                      <button
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
-                        onClick={() => setSelectedCard(null)}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
+                .find(card => card.id === selectedCard) && (
+                <div>
+                  <CardTecnica {...playerCards.find(card => card.id === selectedCard)!} />
+                  <div className="mt-4 flex justify-center space-x-4">
+                    <button
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
+                      onClick={handleConfirm}
+                    >
+                      Selecionar para o Centro
+                    </button>
+                    <button
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"
+                      onClick={() => setSelectedCard(null)}
+                    >
+                      Cancelar
+                    </button>
                   </div>
-                ))}
+                </div>
+              )}
             </div>
           </div>
         )}
