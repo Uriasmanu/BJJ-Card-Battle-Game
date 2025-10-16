@@ -39,19 +39,21 @@ export default function ArenaPage() {
     return novoArray;
   };
 
-  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
-    id: tecnica.id,
-    titulo: tecnica.nome,
-    categoria: tecnica.categoria as Categoria,
-    descricao: tecnica.descricao,
-    faixa: tecnica.faixa,
-    pontos: tecnica.pontos ?? 0,
-    corCategoria: obterCorCategoria(tecnica.categoria).cor,
-    dificuldade: tecnica.dificuldade as Dificuldade,
-    corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
-    imagemUrl: tecnica.imagem,
-    gifUrl: tecnica.gif,
-  }));
+  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => {
+    return {
+      id: tecnica.id,
+      titulo: tecnica.nome,
+      categoria: tecnica.categoria as Categoria,
+      descricao: tecnica.descricao,
+      faixa: tecnica.faixa,
+      pontos: tecnica.pontos ?? 0,
+      corCategoria: obterCorCategoria(tecnica.categoria).cor,
+      dificuldade: tecnica.dificuldade as Dificuldade,
+      corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
+      imagemUrl: tecnica.imagem,
+      gifUrl: tecnica.gif,
+    };
+  };
 
   // Distribuição inicial: 1 carta por categoria (6 cartas por jogador)
   useEffect(() => {
@@ -65,7 +67,6 @@ export default function ArenaPage() {
       const cartasCategoria = cartasTodas.filter(c => c.categoria === categoria);
       const embaralhadas = embaralhar(cartasCategoria);
 
-      // Carta para jogador e CPU
       const cartaPlayer = embaralhadas[0];
       const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : embaralhadas[0];
 
@@ -78,7 +79,7 @@ export default function ArenaPage() {
   }, []);
 
   const handleCardClick = (cardId: string) => {
-    if (activeCard) return; // bloqueia seleção durante batalha
+    if (activeCard) return;
     setSelectedCard(cardId);
   };
 
@@ -215,10 +216,3 @@ export default function ArenaPage() {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
