@@ -234,7 +234,7 @@ export default function ArenaPage() {
         <div className="flex flex-col items-center">
           <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
             <div
-              className="w-full bg-green-500 absolute bottom-0 transition-all duration-500 ease-out"
+              className="w-full bg-blue-500 absolute bottom-0 transition-all duration-500 ease-out"
               style={{ height: `${leftProgress}%` }}
             ></div>
             <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
@@ -248,7 +248,7 @@ export default function ArenaPage() {
         <div className="flex flex-col items-center">
           <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
             <div
-              className="w-full bg-blue-500 absolute bottom-0 transition-all duration-500 ease-out"
+              className="w-full bg-green-500 absolute bottom-0 transition-all duration-500 ease-out"
               style={{ height: `${rightProgress}%` }}
             ></div>
             <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
