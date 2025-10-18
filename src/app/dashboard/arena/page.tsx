@@ -1,5 +1,3 @@
-// pages/ArenaPage.tsx (Código COMPLETO e Refatorado)
-
 'use client';
 
 import CardBatalha from '@/components/cardBatalha';
@@ -9,12 +7,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { HandFist, Zap } from 'lucide-react';
 import { distribuirCartasIniciais, Carta } from '@/lib/gameLogic/cardSetup';
 import { 
-  processarTurno, 
   processarJogadaCpu, 
   isFinalizacaoCard as isFinalizacaoCardLogic, 
   canPlayFinalizacao as canPlayFinalizacaoLogic 
 } from '@/lib/gameLogic/combatLogic';
-
+import { handleConfirmTurn } from '@/lib/gameLogic/arenaHandlers';
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -32,22 +29,18 @@ export default function ArenaPage() {
   const [forceButtonActive, setForceButtonActive] = useState(false);
   const staminaCost = 30;
 
-  // Estados das barras de progresso
+  // Barras de progresso
   const [leftProgress, setLeftProgress] = useState(0);
   const [rightProgress, setRightProgress] = useState(0);
 
-  // NOTA: As funções locais foram substituídas pelas importadas,
-  // mas criamos wrappers simples para facilitar o uso no JSX e em outras handlers,
-  // passando os estados de progresso:
-  const canPlayFinalizacao = useCallback((isPlayer: boolean) => {
-    return canPlayFinalizacaoLogic(isPlayer, leftProgress, rightProgress);
-  }, [leftProgress, rightProgress]);
-  
-  // Renomeando para evitar conflito com a importação
+  const canPlayFinalizacao = useCallback(
+    (isPlayer: boolean) => canPlayFinalizacaoLogic(isPlayer, leftProgress, rightProgress),
+    [leftProgress, rightProgress]
+  );
+
   const isFinalizacaoCard = (carta: Carta) => isFinalizacaoCardLogic(carta);
 
-
-  // Monta cartas do jogador e CPU usando a função refatorada
+  // Distribui cartas iniciais
   useEffect(() => {
     const { playerCards, cpuCards } = distribuirCartasIniciais();
     setPlayerCards(playerCards);
@@ -69,9 +62,7 @@ export default function ArenaPage() {
   };
 
   const handleOpponentCardClick = () => {
-    if (opponentCard) {
-      setShowOpponentModal(true);
-    }
+    if (opponentCard) setShowOpponentModal(true);
   };
 
   const handleConfirm = useCallback(
@@ -79,52 +70,38 @@ export default function ArenaPage() {
       const chosenCardId = cardId ?? selectedCard;
       if (!chosenCardId) return;
 
-      const cartaSelecionada = playerCards.find((c) => c.id === chosenCardId);
-      if (!cartaSelecionada) return;
-
-      // 🎯 LÓGICA DE COMBATE CENTRAL (ESCOLHA DA CPU E ATUALIZAÇÃO DE PROGRESOS) FOI MOVIDA PARA processarTurno
-      const resultado = processarTurno(
-        cartaSelecionada,
+      handleConfirmTurn({
+        selectedCardId: chosenCardId,
+        playerCards,
         cpuCards,
         turno,
         leftProgress,
-        rightProgress
-      );
-      
-      // Atualiza os estados com base no resultado da lógica de combate
-      setLeftProgress(resultado.novoLeftProgress);
-      setRightProgress(resultado.novoRightProgress);
-
-      setActiveCard(cartaSelecionada);
-      setOpponentCard(resultado.cpuCard);
-
-      setPlayerCards((prev) => prev.filter((c) => c.id !== cartaSelecionada.id));
-      setCpuCards((prev) => prev.filter((c) => c.id !== resultado.cpuCard.id));
-
-      setSelectedCard(null);
-      setTurno((prev) => prev + 1);
-      setForceButtonActive(false);
+        rightProgress,
+        setPlayerCards,
+        setCpuCards,
+        setActiveCard,
+        setOpponentCard,
+        setLeftProgress,
+        setRightProgress,
+        setSelectedCard,
+        setTurno,
+        setForceButtonActive,
+      });
     },
     [selectedCard, playerCards, cpuCards, turno, leftProgress, rightProgress]
   );
 
-  // Botão de força (PULA A VEZ DO JOGADOR - JOGADA DA CPU AUTOMÁTICA)
   const useForceAbility = useCallback(() => {
     if (stamina >= staminaCost && cpuCards.length > 0) {
-      setStamina((prev) => prev - staminaCost);
+      setStamina(prev => prev - staminaCost);
       setForceButtonActive(true);
 
-      // 🎯 LÓGICA DE JOGADA DA CPU FOI MOVIDA PARA processarJogadaCpu
       const cpuCarta = processarJogadaCpu(cpuCards, turno, rightProgress);
 
-      // Oponente joga
       setOpponentCard(cpuCarta);
-      setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
-
-      // Nenhuma carta do jogador é exibida (já que ele pulou)
+      setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
       setActiveCard(null);
-
-      setTurno((prev) => prev + 1);
+      setTurno(prev => prev + 1);
 
       setTimeout(() => setForceButtonActive(false), 2000);
     } else if (stamina < staminaCost) {
@@ -135,9 +112,8 @@ export default function ArenaPage() {
   // Regeneração de estamina
   useEffect(() => {
     const interval = setInterval(() => {
-      setStamina((prev) => Math.min(prev + 5, maxStamina));
+      setStamina(prev => Math.min(prev + 5, maxStamina));
     }, 30000);
-
     return () => clearInterval(interval);
   }, [maxStamina]);
 
@@ -150,7 +126,7 @@ export default function ArenaPage() {
         </div>
       </div>
 
-      {/* Barras de Progresso Verticais */}
+      {/* Barras de Progresso */}
       <div className="absolute left-4 top-3/7 transform -translate-y-1/2 z-20">
         <div className="flex flex-col items-center">
           <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
@@ -191,10 +167,7 @@ export default function ArenaPage() {
             <div className="rounded-xl p-4 sm:p-6 border border-white/10">
               <div className="flex justify-center items-center space-x-4">
                 {opponentCard && (
-                  <div
-                    className="transform scale-90 lg:scale-100 cursor-pointer"
-                    onClick={handleOpponentCardClick}
-                  >
+                  <div className="transform scale-90 lg:scale-100 cursor-pointer" onClick={handleOpponentCardClick}>
                     <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                   </div>
@@ -233,9 +206,7 @@ export default function ArenaPage() {
 
           <button
             className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200
-              ${stamina >= staminaCost
-                ? 'bg-red-600 hover:bg-red-700 active:scale-95'
-                : 'bg-gray-500 cursor-not-allowed'}
+              ${stamina >= staminaCost ? 'bg-red-600 hover:bg-red-700 active:scale-95' : 'bg-gray-500 cursor-not-allowed'}
               ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}`}
             onClick={useForceAbility}
             disabled={stamina < staminaCost}
@@ -247,19 +218,17 @@ export default function ArenaPage() {
         {/* Player Hand */}
         <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
           <div className="flex space-x-2 sm:space-x-4">
-            {playerCards.map((card) => {
-              // Usa as funções de lógica importadas
+            {playerCards.map(card => {
               const isFinalizacaoBloqueada = isFinalizacaoCard(card) && !canPlayFinalizacao(true);
-
               return (
                 <div
                   key={card.id}
                   className={`transition-all duration-300 flex-shrink-0 relative ${selectedCard === card.id
-                      ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
-                      : isFinalizacaoBloqueada
-                        ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
-                        : 'hover:transform hover:-translate-y-2 hover:scale-105'
-                    }`}
+                    ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
+                    : isFinalizacaoBloqueada
+                      ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
+                      : 'hover:transform hover:-translate-y-2 hover:scale-105'
+                  }`}
                 >
                   <CardBatalha
                     {...card}
@@ -279,24 +248,12 @@ export default function ArenaPage() {
 
         {/* Modal da carta selecionada */}
         {selectedCard && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={() => setSelectedCard(null)}
-          >
-            <div
-              className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-3 right-3 text-white font-bold text-xl"
-                onClick={() => setSelectedCard(null)}
-              >
-                ×
-              </button>
-
-              {playerCards.find((card) => card.id === selectedCard) && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedCard(null)}>
+            <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
+              <button className="absolute top-3 right-3 text-white font-bold text-xl" onClick={() => setSelectedCard(null)}>×</button>
+              {playerCards.find(card => card.id === selectedCard) && (
                 <div>
-                  <CardTecnica {...playerCards.find((card) => card.id === selectedCard)!} />
+                  <CardTecnica {...playerCards.find(card => card.id === selectedCard)!} />
                   <div className="mt-4 flex justify-center space-x-4">
                     <button
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
@@ -319,30 +276,13 @@ export default function ArenaPage() {
 
         {/* Modal da carta do oponente */}
         {showOpponentModal && opponentCard && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={() => setShowOpponentModal(false)}
-          >
-            <div
-              className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-3 right-3 text-white font-bold text-xl"
-                onClick={() => setShowOpponentModal(false)}
-              >
-                ×
-              </button>
-
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowOpponentModal(false)}>
+            <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
+              <button className="absolute top-3 right-3 text-white font-bold text-xl" onClick={() => setShowOpponentModal(false)}>×</button>
               <div>
                 <CardTecnica {...opponentCard} />
                 <div className="mt-4 flex justify-center">
-                  <button
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold"
-                    onClick={() => setShowOpponentModal(false)}
-                  >
-                    Fechar
-                  </button>
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold" onClick={() => setShowOpponentModal(false)}>Fechar</button>
                 </div>
               </div>
             </div>
