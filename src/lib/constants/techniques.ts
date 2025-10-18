@@ -106,6 +106,26 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['fuga-de-quadril', 'ponte-sobre-ombro'],
     ...getAssetPaths(''),
   },
+{
+  id: 'cem-quilos',
+  nome: 'Cem Quilos',
+  categoria: 'estabilização',
+  dificuldade: 'intermediario',
+  descricao: 'Técnica de controle por cima, mantendo o peso sobre o oponente para limitar seus movimentos e preparar transições ou finalizações.',
+  faixa: '(Todas)',
+  vantagens: [],
+  defesas: [
+    'Escape de quadril',
+    'Subida de guarda',
+    'Empurrar para criar espaço'
+  ],
+  proximosMovimentos: [
+    'mata-leão',
+    'arm-lock',
+    'raspagem-lateral'
+  ],
+  ...getAssetPaths('cem-quilos'),
+},
   {
     id: 'chamada-de-guarda',
     nome: 'Chamada de Guarda',
