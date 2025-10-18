@@ -7,11 +7,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { HandFist, Zap } from 'lucide-react';
 import { distribuirCartasIniciais, Carta } from '@/lib/gameLogic/cardSetup';
 import { 
-  processarJogadaCpu, 
   isFinalizacaoCard as isFinalizacaoCardLogic, 
   canPlayFinalizacao as canPlayFinalizacaoLogic 
 } from '@/lib/gameLogic/combatLogic';
 import { handleConfirmTurn } from '@/lib/gameLogic/arenaHandlers';
+import { useForceAbilityLogic } from '@/lib/gameLogic/forceAbilityLogic'; // Importação da lógica refatorada
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -91,23 +91,37 @@ export default function ArenaPage() {
     [selectedCard, playerCards, cpuCards, turno, leftProgress, rightProgress]
   );
 
+  /**
+   * Função refatorada que chama a lógica externa de Força (Stamina).
+   * Note que ela é muito mais limpa agora.
+   */
   const useForceAbility = useCallback(() => {
-    if (stamina >= staminaCost && cpuCards.length > 0) {
-      setStamina(prev => prev - staminaCost);
-      setForceButtonActive(true);
-
-      const cpuCarta = processarJogadaCpu(cpuCards, turno, rightProgress);
-
-      setOpponentCard(cpuCarta);
-      setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
-      setActiveCard(null);
-      setTurno(prev => prev + 1);
-
-      setTimeout(() => setForceButtonActive(false), 2000);
-    } else if (stamina < staminaCost) {
-      alert('Estamina insuficiente!');
-    }
-  }, [stamina, staminaCost, cpuCards, turno, rightProgress]);
+    useForceAbilityLogic({
+      stamina,
+      staminaCost,
+      cpuCards,
+      turno,
+      rightProgress,
+      setStamina,
+      setForceButtonActive,
+      setOpponentCard,
+      setCpuCards,
+      setActiveCard,
+      setTurno,
+    });
+  }, [
+    stamina,
+    staminaCost,
+    cpuCards,
+    turno,
+    rightProgress,
+    setStamina,
+    setForceButtonActive,
+    setOpponentCard,
+    setCpuCards,
+    setActiveCard,
+    setTurno,
+  ]);
 
   // Regeneração de estamina
   useEffect(() => {
@@ -228,7 +242,7 @@ export default function ArenaPage() {
                     : isFinalizacaoBloqueada
                       ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
                       : 'hover:transform hover:-translate-y-2 hover:scale-105'
-                  }`}
+                    }`}
                 >
                   <CardBatalha
                     {...card}

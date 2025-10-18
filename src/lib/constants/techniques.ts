@@ -827,6 +827,7 @@ export const TECNICAS: Tecnica[] = [
     id: 'jacare-banguela',
     nome: 'Jacare Banguela (Uki waza)',
     categoria: 'queda',
+    pontos: 2,
     dificuldade: 'facil',
     descricao: 'Técnica de queda utilizando alavanca e controle do quadril',
     faixa: '(Todas)',
