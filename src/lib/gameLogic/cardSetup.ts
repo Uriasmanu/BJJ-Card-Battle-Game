@@ -68,26 +68,53 @@ export const CATEGORIAS_TECNICAS: Categoria[] = [
 export const TODAS_AS_CARTAS: Carta[] = TECNICAS.map(montarCarta);
 // ------------------------------------------
 
-// Função principal para distribuir cartas entre jogador e CPU
+// lib/gameLogic/cardSetup.ts
+
+// ... imports e interfaces existentes
+
+// Nova função para distribuir cartas sem limitação por categoria
 export const distribuirCartasIniciais = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
   const cartasTodas = TODAS_AS_CARTAS;
-  const categorias = CATEGORIAS_TECNICAS;
+  
+  // Embaralha todas as cartas
+  const cartasEmbaralhadas = embaralhar([...cartasTodas]);
+  
+  // Distribui 8 cartas para cada jogador (ou ajuste conforme necessário)
+  const player = cartasEmbaralhadas.slice(0, 8);
+  const cpu = cartasEmbaralhadas.slice(8, 16);
+  
+  return { playerCards: player, cpuCards: cpu };
+};
 
+// Função alternativa se quiser manter alguma variedade de categorias
+export const distribuirCartasBalanceadas = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
+  const cartasPorCategoria: Record<Categoria, Carta[]> = {} as Record<Categoria, Carta[]>;
+  
+  // Agrupa cartas por categoria
+  CATEGORIAS_TECNICAS.forEach(categoria => {
+    cartasPorCategoria[categoria] = TODAS_AS_CARTAS.filter(c => c.categoria === categoria);
+  });
+  
   const player: Carta[] = [];
   const cpu: Carta[] = [];
-
-  categorias.forEach((categoria) => {
-    const cartasCategoria = cartasTodas.filter((c) => c.categoria === categoria);
+  
+  // Para cada categoria, pega 1-2 cartas aleatórias para cada jogador
+  CATEGORIAS_TECNICAS.forEach(categoria => {
+    const cartasCategoria = [...cartasPorCategoria[categoria]];
     const embaralhadas = embaralhar(cartasCategoria);
-
-    if (embaralhadas.length > 0) {
-      const cartaPlayer = embaralhadas[0];
-      const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : null;
-
-      player.push(cartaPlayer);
-      if (cartaCpu) cpu.push(cartaCpu);
-    }
+    
+    // Adiciona até 2 cartas para o jogador desta categoria
+    const cartasPlayer = embaralhadas.slice(0, 2);
+    player.push(...cartasPlayer);
+    
+    // Adiciona até 2 cartas para a CPU desta categoria
+    const cartasCPU = embaralhadas.slice(2, 4);
+    cpu.push(...cartasCPU);
   });
-
-  return { playerCards: player, cpuCards: cpu };
+  
+  // Embaralha as mãos finais para misturar as categorias
+  return {
+    playerCards: embaralhar(player).slice(0, 8),
+    cpuCards: embaralhar(cpu).slice(0, 8)
+  };
 };

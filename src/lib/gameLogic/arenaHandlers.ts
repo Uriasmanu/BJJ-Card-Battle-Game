@@ -56,9 +56,6 @@ export const handleConfirmTurn = ({
   setActiveCard(cartaSelecionada);
   setOpponentCard(resultado.cpuCard);
 
-  setPlayerCards((prev) => prev.filter((c) => c.id !== cartaSelecionada.id));
-  setCpuCards((prev) => prev.filter((c) => c.id !== resultado.cpuCard.id));
-
   setSelectedCard(null);
   setTurno(turno + 1);
   setForceButtonActive(false);

@@ -4,7 +4,6 @@ import CardBatalha from '@/components/cardBatalha';
 import CardTecnica from '@/components/cardTecnica';
 import Placar from '@/components/placar';
 import { useState, useEffect, useCallback } from 'react';
-
 import { HandFist, Zap, ArrowLeft, Grid3X3 } from 'lucide-react';
 import {
   distribuirCartasIniciais,
@@ -72,7 +71,7 @@ export default function ArenaPage() {
     }
   };
 
-  // NOVA FUNÇÃO: Para selecionar carta do catálogo
+  // Selecionar carta do catálogo
   const handleCatalogCardClick = (carta: Carta) => {
     if (isFinalizacaoCard(carta) && !canPlayFinalizacao(true)) {
       alert('Você só pode jogar cartas de finalização quando sua barra de progresso estiver em 100%!');
@@ -92,10 +91,9 @@ export default function ArenaPage() {
       const chosenCardId = cardId ?? selectedCard;
       if (!chosenCardId) return;
 
-      // Encontra a carta tanto na mão do jogador quanto no catálogo completo
-      const cartaParaJogar = playerCards.find(card => card.id === chosenCardId) ||
+      const cartaParaJogar =
+        playerCards.find(card => card.id === chosenCardId) ||
         TODAS_AS_CARTAS.find(card => card.id === chosenCardId);
-
       if (!cartaParaJogar) return;
 
       handleConfirmTurn({
@@ -178,7 +176,6 @@ export default function ArenaPage() {
               const quantidade = TODAS_AS_CARTAS.filter(
                 carta => carta.categoria.toLowerCase() === category.toLowerCase()
               ).length;
-
               return (
                 <button
                   key={category}
@@ -226,7 +223,7 @@ export default function ArenaPage() {
           </button>
         </div>
 
-        {/* Carrossel de Cartas - Usando CardBatalha para manter consistência */}
+        {/* Carrossel de Cartas */}
         <div className="overflow-x-auto py-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
           <div className="flex space-x-4 pb-4 min-w-max px-2">
             {cartasDaCategoria.map((carta) => {
@@ -236,10 +233,11 @@ export default function ArenaPage() {
               return (
                 <div
                   key={carta.id}
-                  className={`transition-all duration-300 flex-shrink-0 relative ${isFinalizacaoBloqueada
+                  className={`transition-all duration-300 flex-shrink-0 relative ${
+                    isFinalizacaoBloqueada
                       ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
                       : 'hover:transform hover:-translate-y-2 hover:scale-105 cursor-pointer'
-                    } ${naMao ? 'ring-2 ring-green-500 rounded-lg' : ''}`}
+                  } ${naMao ? 'ring-2 ring-green-500 rounded-lg' : ''}`}
                   onClick={isFinalizacaoBloqueada ? undefined : () => handleCatalogCardClick(carta)}
                 >
                   <CardBatalha
@@ -393,7 +391,10 @@ export default function ArenaPage() {
 
         {/* Modal da carta selecionada */}
         {selectedCard && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedCard(null)}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedCard(null)}
+          >
             <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
               <button className="absolute top-3 right-3 text-white font-bold text-xl" onClick={() => setSelectedCard(null)}>×</button>
               {(playerCards.find(card => card.id === selectedCard) || TODAS_AS_CARTAS.find(card => card.id === selectedCard)) && (
@@ -421,7 +422,10 @@ export default function ArenaPage() {
 
         {/* Modal da carta do oponente */}
         {showOpponentModal && opponentCard && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setShowOpponentModal(false)}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setShowOpponentModal(false)}
+          >
             <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
               <button className="absolute top-3 right-3 text-white font-bold text-xl" onClick={() => setShowOpponentModal(false)}>×</button>
               <div>
