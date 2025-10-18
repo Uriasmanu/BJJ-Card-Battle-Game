@@ -18,7 +18,7 @@ interface ForceAbilityParams {
   setTurno: Dispatch<SetStateAction<number>>;
 }
 
-export const useForceAbilityLogic = ({
+export const forceAbilityLogic = ({
   stamina,
   staminaCost,
   cpuCards,
