@@ -57,10 +57,10 @@ const atualizarProgresso = (
 
   if (playerTecnica.vantagens.includes(cpuTecnica.id)) {
     // Jogador tem vantagem -> aumenta progresso do jogador
-    novoLeftProgress = Math.min(currentLeftProgress + (playerCard.pontos || 10), 100);
+    novoLeftProgress = Math.min(currentLeftProgress + 20, 100);
   } else if (cpuTecnica.vantagens.includes(playerTecnica.id)) {
     // CPU tem vantagem -> aumenta progresso da CPU
-    novoRightProgress = Math.min(currentRightProgress + (cpuCard.pontos || 10), 100);
+    novoRightProgress = Math.min(currentLeftProgress + 20, 100);
   } else {
     // Empate - sem alteração no progresso
   }
