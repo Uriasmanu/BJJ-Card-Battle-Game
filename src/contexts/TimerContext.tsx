@@ -1,7 +1,7 @@
 // contexts/TimerContext.tsx
 'use client';
 
-import { Belt, getBeltById } from '@/lib/constants/belts';
+import { Belt, getBeltById } from '@/lib/constants/belts'; // Presumindo que você tem este arquivo
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 
@@ -65,19 +65,27 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
 
   const resetTimer = () => {
     setIsRunning(false);
-    setTimeLeft(initialTime);
+    // Garante que o tempo de reset seja o tempo inicial, se for válido.
+    setTimeLeft(initialTime > 0 ? initialTime : getBeltFightTime(currentBelt)); 
   };
 
   const toggleTimer = () => {
     setIsRunning(!isRunning);
   };
 
-  // Efeito para decrementar o timer
+  // Efeito para decrementar o timer (Com Correção de Sincronização)
   useEffect(() => {
-    if (!isRunning) return;
+    // CORREÇÃO: Verifica se isRunning é TRUE E se timeLeft é maior que 0.
+    // Isso garante que o timer só inicie se houver um tempo válido.
+    if (!isRunning || timeLeft <= 0) {
+      // Se não estiver rodando ou o tempo acabou, não faz nada e a função de limpeza
+      // (return) garante que qualquer intervalo anterior seja parado.
+      return;
+    }
 
     const interval = setInterval(() => {
       setTimeLeft(prev => {
+        // Lógica de decremento usando a forma de função (segura)
         if (prev <= 1) {
           setIsRunning(false);
           return 0;
@@ -86,8 +94,14 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
       });
     }, 1000);
 
+    // Limpa o intervalo quando o componente desmonta ou quando
+    // as dependências (isRunning ou timeLeft) mudam.
     return () => clearInterval(interval);
-  }, [isRunning]);
+    
+    // CORREÇÃO: Adicionamos 'timeLeft' para garantir que o useEffect seja reexecutado
+    // quando 'startTimer' define o tempo inicial, garantindo que o setInterval
+    // comece com o valor correto, especialmente no ambiente de produção (Vercel).
+  }, [isRunning, timeLeft]); 
 
 
   const value: TimerContextType = {
