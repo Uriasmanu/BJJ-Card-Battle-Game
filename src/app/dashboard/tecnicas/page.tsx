@@ -170,7 +170,7 @@ export default function TecnicasPage() {
               corDificuldade={obterCorDificuldade(t.dificuldade).cor}
               imagemUrl={t.imagem}
               gifUrl={t.gif}
-              proximasTecnicas={t.proximasTecnicas}   // <- adicionado
+              proximosMovimentos={t.proximosMovimentos}   // <- adicionado
               defesas={t.defesas}                     // <- adicionado
               onCardClick={(id) => console.log('Técnica clicada:', id)}
             />

@@ -17,7 +17,7 @@ interface CardProps {
   className?: string;
 
   // NOVO: próximas técnicas e defesas
-  proximasTecnicas?: string[];
+  proximosMovimentos?: string[];
   defesas?: string[];
 }
 
@@ -35,7 +35,7 @@ export default function CardTecnica({
   gifUrl,
   onCardClick,
   className = '',
-  proximasTecnicas = [],
+  proximosMovimentos = [],
   defesas = []
 }: CardProps) {
   const [imagemErro, setImagemErro] = useState(false);
@@ -200,11 +200,11 @@ export default function CardTecnica({
         <p className="text-sm text-gray-600 mb-3 flex-grow whitespace-normal">{descricao}</p>
 
         {/* Próximas técnicas e defesas */}
-        {(proximasTecnicas.length > 0 || defesas.length > 0) && (
+        {(proximosMovimentos.length > 0 || defesas.length > 0) && (
           <div className="mt-3 text-sm space-y-1">
-            {proximasTecnicas.length > 0 && (
+            {proximosMovimentos.length > 0 && (
               <div>
-                <span className="font-semibold">Próximas técnicas:</span> {proximasTecnicas.join(", ")}
+                <span className="font-semibold">Próximas técnicas:</span> {proximosMovimentos.join(", ")}
               </div>
             )}
             {defesas.length > 0 && (
