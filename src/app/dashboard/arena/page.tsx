@@ -48,6 +48,10 @@ export default function ArenaPage() {
   const [forceButtonActive, setForceButtonActive] = useState(false);
   const staminaCost = 30;
 
+  // Estados das barras de progresso
+  const [leftProgress, setLeftProgress] = useState(0);
+  const [rightProgress, setRightProgress] = useState(0);
+
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
     for (let i = novoArray.length - 1; i > 0; i--) {
@@ -106,6 +110,23 @@ export default function ArenaPage() {
     setStartTimer(true);
   }, []);
 
+  // Efeito para as barras de progresso aumentarem a cada 5 segundos
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      setLeftProgress(prev => {
+        const newProgress = prev + 10;
+        return newProgress > 100 ? 100 : newProgress;
+      });
+      
+      setRightProgress(prev => {
+        const newProgress = prev + 10;
+        return newProgress > 100 ? 100 : newProgress;
+      });
+    }, 5000);
+
+    return () => clearInterval(progressInterval);
+  }, []);
+
   const handleCardClick = (cardId: string) => {
     if (!selectedCard) setSelectedCard(cardId);
   };
@@ -116,7 +137,6 @@ export default function ArenaPage() {
     }
   };
 
-  // Confirma a jogada do jogador
   const handleConfirm = useCallback(
     (cardId?: string) => {
       const chosenCardId = cardId ?? selectedCard;
@@ -126,13 +146,18 @@ export default function ArenaPage() {
       if (!cartaSelecionada) return;
 
       let cpuCarta: Carta;
+
       if (turno === 1) {
-        const opcoesCpu = cpuCards.filter((c) => c.categoria === 'queda' || c.categoria === 'guarda');
+        // Lógica de restrição para Turno 1 (CPU escolhe Queda ou Chamada para Guarda)
+        const categoriasPermitidas: Categoria[] = ['chamada para guarda', 'queda'];
+        const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
+
         cpuCarta =
           opcoesCpu.length > 0
             ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
             : cpuCards[Math.floor(Math.random() * cpuCards.length)];
       } else {
+        // Demais turnos, escolhe qualquer carta
         cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
       }
 
@@ -149,19 +174,33 @@ export default function ArenaPage() {
     [selectedCard, playerCards, cpuCards, turno]
   );
 
-  // Botão de força (pula a vez do jogador)
+  // Botão de força (PULA A VEZ DO JOGADOR - JOGADA DA CPU AUTOMÁTICA)
   const useForceAbility = useCallback(() => {
     if (stamina >= staminaCost && cpuCards.length > 0) {
       setStamina((prev) => prev - staminaCost);
       setForceButtonActive(true);
 
-      // Oponente joga sozinho
-      const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
-      setOpponentCard(cpuCarta);
+      let cpuCarta: Carta;
+      
+      // RESTRIÇÃO DE TURNO 1 APLICADA AQUI TAMBÉM! 🎯
+      if (turno === 1) {
+        const categoriasPermitidas: Categoria[] = ['chamada para guarda', 'queda'];
+        const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
 
+        cpuCarta =
+          opcoesCpu.length > 0
+            ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
+            : cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      } else {
+        // Demais turnos, escolhe qualquer carta
+        cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      }
+      
+      // Oponente joga
+      setOpponentCard(cpuCarta);
       setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
 
-      // Nenhuma carta do jogador é exibida
+      // Nenhuma carta do jogador é exibida (já que ele pulou)
       setActiveCard(null);
 
       setTurno((prev) => prev + 1);
@@ -170,7 +209,7 @@ export default function ArenaPage() {
     } else if (stamina < staminaCost) {
       alert('Estamina insuficiente!');
     }
-  }, [stamina, staminaCost, cpuCards]);
+  }, [stamina, staminaCost, cpuCards, turno]);
 
   // Regeneração de estamina
   useEffect(() => {
@@ -187,6 +226,35 @@ export default function ArenaPage() {
       <div className="absolute inset-0 flex items-center justify-center z-0">
         <div className="relative w-[95vmin] max-w-[900px] aspect-square bg-yellow-500 rounded-2xl shadow-2xl flex items-center justify-center -translate-y-10 sm:translate-y-0">
           <div className="absolute inset-[10%] bg-blue-600 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Barras de Progresso Verticais */}
+      <div className="absolute left-4 top-3/7 transform -translate-y-1/2 z-20">
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
+            <div 
+              className="w-full bg-green-500 absolute bottom-0 transition-all duration-500 ease-out"
+              style={{ height: `${leftProgress}%` }}
+            ></div>
+            <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              {leftProgress}%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute right-4 top-3/7 transform -translate-y-1/2 z-20">
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
+            <div 
+              className="w-full bg-blue-500 absolute bottom-0 transition-all duration-500 ease-out"
+              style={{ height: `${rightProgress}%` }}
+            ></div>
+            <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              {rightProgress}%
+            </div>
+          </div>
         </div>
       </div>
 
