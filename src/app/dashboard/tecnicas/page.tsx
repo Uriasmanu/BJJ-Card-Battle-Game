@@ -13,10 +13,8 @@ export default function TecnicasPage() {
   const [filtroFaixa, setFiltroFaixa] = useState("todas");
   const [filtroCategoria, setFiltroCategoria] = useState("todas");
 
-  // Pegar categorias únicas do array TECNICAS
   const categoriasDisponiveis = Array.from(new Set(TECNICAS.map(t => t.categoria)));
 
-  // Filtrar técnicas baseado na busca, faixa e categoria
   const tecnicasFiltradas = tecnicas.filter((tecnica) => {
     const matchesBusca =
       tecnica.nome.toLowerCase().includes(busca.toLowerCase()) ||
@@ -25,16 +23,13 @@ export default function TecnicasPage() {
       filtroFaixa === "todas" || tecnica.faixa === filtroFaixa.toLowerCase();
     const matchesCategoria =
       filtroCategoria === "todas" || tecnica.categoria === filtroCategoria.toLowerCase();
-
     return matchesBusca && matchesFaixa && matchesCategoria;
   });
 
   const handleAdd = () => {
     if (!tecnicaSelecionada) return;
-
     const encontrada = TECNICAS.find((t) => t.id === tecnicaSelecionada);
     if (!encontrada) return;
-
     const jaExiste = tecnicas.some(t => t.id === encontrada.id);
     if (jaExiste) {
       alert("Esta técnica já está no seu deck!");
@@ -42,7 +37,6 @@ export default function TecnicasPage() {
       setMostrarModal(false);
       return;
     }
-
     setTecnicas((prev) => [encontrada, ...prev]);
     setTecnicaSelecionada("");
     setMostrarModal(false);
@@ -87,8 +81,8 @@ export default function TecnicasPage() {
         {/* Buscar, filtrar e adicionar */}
         <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
           {/* Busca */}
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="relative flex items-center w-full md:w-64">
+            <Search className="absolute left-3 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Buscar técnica..."
@@ -99,8 +93,8 @@ export default function TecnicasPage() {
           </div>
 
           {/* Filtro de faixa */}
-          <div className="relative w-full md:w-40">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="relative flex items-center w-full md:w-40">
+            <Filter className="absolute left-3 text-gray-400 w-4 h-4" />
             <select
               value={filtroFaixa}
               onChange={(e) => setFiltroFaixa(e.target.value)}
@@ -116,8 +110,8 @@ export default function TecnicasPage() {
           </div>
 
           {/* Filtro de categoria dinâmico */}
-          <div className="relative w-full md:w-40">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="relative flex items-center w-full md:w-40">
+            <Filter className="absolute left-3 text-gray-400 w-4 h-4" />
             <select
               value={filtroCategoria}
               onChange={(e) => setFiltroCategoria(e.target.value)}
@@ -170,14 +164,17 @@ export default function TecnicasPage() {
               corCategoria={obterCorCategoria(t.categoria).cor}
               dificuldade={
                 t.dificuldade === 'facil' ? 'facil' :
-                t.dificuldade === 'intermediario' ? 'intermediario' :
-                'dificil'
+                  t.dificuldade === 'intermediario' ? 'intermediario' :
+                    'dificil'
               }
               corDificuldade={obterCorDificuldade(t.dificuldade).cor}
               imagemUrl={t.imagem}
               gifUrl={t.gif}
+              proximasTecnicas={t.proximasTecnicas}   // <- adicionado
+              defesas={t.defesas}                     // <- adicionado
               onCardClick={(id) => console.log('Técnica clicada:', id)}
             />
+
             <button
               onClick={() => handleRemoverTecnica(t.id)}
               className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"

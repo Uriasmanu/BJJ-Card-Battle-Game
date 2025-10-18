@@ -1,14 +1,13 @@
-// src/lib/constants/techniques.ts
 export interface Tecnica {
   id: string;
   nome: string;
-  categoria: 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa';
+  categoria: 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa' | 'chamada para guarda' | 'estabilização';
   dificuldade: 'facil' | 'intermediario' | 'dificil';
   pontos?: 2 | 3 | 4;
   descricao: string;
-  faixa: 'branca' | 'azul' | 'roxa' | 'marrom' | 'preta' | '( Todas )';
+  faixa: 'branca' | 'azul' | 'roxa' | '( Todas )';
   defesas: string[];
-  proximosMovimentos?: string[]; // ✅ novo atributo
+  proximosMovimentos?: string[];
   gif?: string;
   imagem?: string;
 }
@@ -69,6 +68,19 @@ export const CORES_CATEGORIA = {
     classe: 'text-slate-600 bg-slate-100 border-slate-300',
     gradiente: 'from-slate-500 to-slate-600',
     icone: '🛡️'
+  },
+  // NOVAS CATEGORIAS ADICIONADAS
+  'chamada para guarda': {
+    cor: '#9CA3AF',
+    classe: 'text-gray-500 bg-gray-100 border-gray-300',
+    gradiente: 'from-gray-400 to-gray-500',
+    icone: '🪂'
+  },
+  'estabilização': {
+    cor: '#0891B2',
+    classe: 'text-cyan-600 bg-cyan-100 border-cyan-300',
+    gradiente: 'from-cyan-500 to-cyan-600',
+    icone: '🛑'
   }
 };
 
@@ -113,17 +125,6 @@ export const TECNICAS: Tecnica[] = [
     defesas: [],
     proximosMovimentos: ['fuga-de-quadril'],
     ...getAssetPaths('rolamento-lateral'),
-  },
- {
-    id: 'jacare-banguela',
-    nome: 'Jacare Banguela',
-    categoria: 'queda',
-    dificuldade: 'facil',
-    descricao: 'Técnica de queda utilizando alavanca e controle do quadril',
-    faixa: '( Todas )',
-    defesas: ['defesa-jacare-banguela'],
-    proximosMovimentos: ['montada'],
-    ...getAssetPaths('jacare-banguela'),
   },
   {
     id: 'fuga-de-quadril',
@@ -432,6 +433,128 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['armlock-guarda-fechada'],
     ...getAssetPaths('triangulo'),
   },
+  // 🆕 TÉCNICAS ADICIONADAS
+
+  // JOELHO NA BARRIGA (Knee on Belly)
+  {
+    id: 'joelho-barriga',
+    nome: 'Joelho na Barriga',
+    categoria: 'estabilização',
+    dificuldade: 'intermediario',
+    pontos: 2,
+    descricao: 'Posição de controle com um joelho sobre o abdômen do oponente e outro afastado para equilíbrio.',
+    faixa: 'azul',
+    defesas: ['defesa-joelho-barriga'],
+    proximosMovimentos: ['montada', 'americana-lateral'],
+    ...getAssetPaths('joelho-barriga'),
+  },
+
+  // MONTADA
+  {
+    id: 'montada',
+    nome: 'Montada',
+    categoria: 'estabilização',
+    dificuldade: 'facil',
+    pontos: 4,
+    descricao: 'Posição dominante sentada sobre o tórax do adversário com controle dos quadris e ombros.',
+    faixa: 'branca',
+    defesas: ['tirando-adversario-montada'],
+    proximosMovimentos: ['americana-montada', 'estrangulamento-montada'],
+    ...getAssetPaths('montada'),
+  },
+
+  // PEGADA DE COSTAS COM GANCHOS
+  {
+    id: 'costas',
+    nome: 'Pegada de Costas com Ganchos',
+    categoria: 'estabilização',
+    dificuldade: 'intermediario',
+    pontos: 4,
+    descricao: 'Controle total das costas do adversário com ambos os ganchos e controle do tronco.',
+    faixa: 'azul',
+    defesas: ['tirando-adversario-costas'],
+    proximosMovimentos: ['mata-leao', 'estrangulamento-costas'],
+    ...getAssetPaths('costas'),
+  },
+
+  // OMOPLATA
+  {
+    id: 'omoplata',
+    nome: 'Omoplata',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Chave de ombro aplicada da guarda, usando as pernas para girar o oponente.',
+    faixa: 'azul',
+    defesas: ['defesa-omoplata'],
+    proximosMovimentos: ['estrangulamento-reto-guarda'],
+    ...getAssetPaths('omoplata'),
+  },
+
+  // EZEQUIEL CHOKE
+  {
+    id: 'ezequiel-choke',
+    nome: 'Ezequiel Choke',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento aplicado de dentro da guarda ou da montada usando a própria manga e antebraço.',
+    faixa: 'azul',
+    defesas: ['defesa-ezequiel'],
+    proximosMovimentos: ['montada', 'lateral'],
+    ...getAssetPaths('ezequiel-choke'),
+  },
+
+  // ESTRANGULAMENTO COM GOLA (Lapel Choke)
+  {
+    id: 'estrangulamento-com-gola',
+    nome: 'Estrangulamento com Gola (Lapel Choke)',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento com o uso da gola do kimono, realizado de várias posições de controle.',
+    faixa: 'azul',
+    defesas: ['defesa-estrangulamento-com-gola'],
+    proximosMovimentos: ['montada', 'costas'],
+    ...getAssetPaths('estrangulamento-com-gola'),
+  },
+
+  // GUILHOTINA
+  {
+    id: 'guillotine',
+    nome: 'Guilhotina',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento frontal com o braço em torno do pescoço, usado ao defender quedas.',
+    faixa: 'azul',
+    defesas: ['defesa-guillotine'],
+    proximosMovimentos: ['montada', 'lateral'],
+    ...getAssetPaths('guillotine'),
+  },
+
+  // CROSS COLLAR CHOKE
+  {
+    id: 'estrangulamento-cruzado',
+    nome: 'Estrangulamento Cruzado (Cross Collar Choke)',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento com as mãos cruzadas na gola do adversário, aplicando pressão lateral no pescoço.',
+    faixa: 'azul',
+    defesas: ['defesa-estrangulamento-cruzado'],
+    proximosMovimentos: ['montada'],
+    ...getAssetPaths('estrangulamento-cruzado'),
+  },
+
+  // BOW AND ARROW CHOKE
+  {
+    id: 'estrangulamento-lapeira',
+    nome: 'Estrangulamento de Lapeira (Bow and Arrow Choke)',
+    categoria: 'finalizacao',
+    dificuldade: 'dificil',
+    descricao: 'Estrangulamento aplicado pelas costas puxando a gola e estendendo o corpo como um arco.',
+    faixa: 'roxa',
+    defesas: ['defesa-estrangulamento-lapeira'],
+    proximosMovimentos: ['costas'],
+    ...getAssetPaths('estrangulamento-lapeira'),
+  },
+
   {
     id: 'estrangulamento-montada',
     nome: 'Estrangulamento na Montada',
@@ -657,6 +780,17 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths('defesa-double-leg-em-pe'),
   },
   {
+    id: 'jacare-banguela',
+    nome: 'Jacare Banguela (Uki waza)',
+    categoria: 'queda',
+    dificuldade: 'facil',
+    descricao: 'Técnica de queda utilizando alavanca e controle do quadril',
+    faixa: '( Todas )',
+    defesas: ['defesa-jacare-banguela'],
+    proximosMovimentos: ['montada'],
+    ...getAssetPaths('jacare-banguela'),
+  },
+  {
     id: 'defesa-single-leg',
     nome: 'Defesa Single Leg',
     categoria: 'defesa',
@@ -667,7 +801,7 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths('defesa-single-leg'),
   },
-];
+]; // Fechamento correto do array TECNICAS
 
 // Funções auxiliares
 export const obterTecnicasPorFaixa = (faixa: string): Tecnica[] =>
@@ -682,7 +816,7 @@ export const obterTecnicasPorCategoria = (categoria: string): Tecnica[] =>
 export const obterCorDificuldade = (dificuldade: 'facil' | 'intermediario' | 'dificil') =>
   CORES_DIFICULDADE[dificuldade];
 
-export const obterCorCategoria = (categoria: 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa') =>
+export const obterCorCategoria = (categoria: 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa' | 'chamada para guarda' | 'estabilização') =>
   CORES_CATEGORIA[categoria];
 
 // Nova função para obter defesas
@@ -694,7 +828,7 @@ export const obterDefesasDaTecnica = (tecnicaId: string): Tecnica[] => {
     .filter((tecnica): tecnica is Tecnica => tecnica !== undefined);
 };
 
-// ✅ Nova função para obter os próximos movimentos possíveis
+// Nova função para obter os próximos movimentos possíveis
 export const obterProximosMovimentos = (tecnicaId: string): Tecnica[] => {
   const tecnica = obterTecnicaPorId(tecnicaId);
   if (!tecnica || !tecnica.proximosMovimentos?.length) return [];
