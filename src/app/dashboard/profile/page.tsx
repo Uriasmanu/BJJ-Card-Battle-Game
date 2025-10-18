@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-cente">
+    <div className="w-full min-h-screen flex items-center justify-cente px-4">
 
       <main className="flex flex-col">
         <header>
