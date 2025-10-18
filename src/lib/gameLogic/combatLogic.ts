@@ -62,7 +62,8 @@ const atualizarProgresso = (
     // CPU tem vantagem -> aumenta progresso da CPU
     novoRightProgress = Math.min(currentLeftProgress + 20, 100);
   } else {
-    // Empate - sem alteração no progresso
+    novoLeftProgress = Math.min(currentLeftProgress + 5, 100);
+    novoRightProgress = Math.min(currentLeftProgress + 5, 100);
   }
 
   return { novoLeftProgress, novoRightProgress };
