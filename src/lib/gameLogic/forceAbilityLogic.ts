@@ -38,6 +38,8 @@ export const useForceAbilityLogic = ({
     // Lógica da CPU
     const cpuCarta = processarJogadaCpu(cpuCards, turno, rightProgress);
 
+if (!cpuCarta) return; // evita undefined
+
     setOpponentCard(cpuCarta);
     setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
     setActiveCard(null); // Assegura que o ActiveCard do jogador é nulo quando se usa Força (se for o caso)
