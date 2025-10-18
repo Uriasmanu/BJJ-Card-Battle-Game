@@ -1,12 +1,20 @@
+// pages/ArenaPage.tsx (Código COMPLETO e Refatorado)
+
 'use client';
 
 import CardBatalha from '@/components/cardBatalha';
 import CardTecnica from '@/components/cardTecnica';
 import Placar from '@/components/placar';
 import { useState, useEffect, useCallback } from 'react';
-import { TECNICAS } from '@/lib/constants/techniques';
 import { HandFist, Zap } from 'lucide-react';
 import { distribuirCartasIniciais, Carta } from '@/lib/gameLogic/cardSetup';
+import { 
+  processarTurno, 
+  processarJogadaCpu, 
+  isFinalizacaoCard as isFinalizacaoCardLogic, 
+  canPlayFinalizacao as canPlayFinalizacaoLogic 
+} from '@/lib/gameLogic/combatLogic';
+
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -28,14 +36,16 @@ export default function ArenaPage() {
   const [leftProgress, setLeftProgress] = useState(0);
   const [rightProgress, setRightProgress] = useState(0);
 
-  // Funções auxiliares para verificar finalização
-  const canPlayFinalizacao = (isPlayer: boolean) => {
-    return isPlayer ? leftProgress === 100 : rightProgress === 100;
-  };
+  // NOTA: As funções locais foram substituídas pelas importadas,
+  // mas criamos wrappers simples para facilitar o uso no JSX e em outras handlers,
+  // passando os estados de progresso:
+  const canPlayFinalizacao = useCallback((isPlayer: boolean) => {
+    return canPlayFinalizacaoLogic(isPlayer, leftProgress, rightProgress);
+  }, [leftProgress, rightProgress]);
+  
+  // Renomeando para evitar conflito com a importação
+  const isFinalizacaoCard = (carta: Carta) => isFinalizacaoCardLogic(carta);
 
-  const isFinalizacaoCard = (carta: Carta) => {
-    return carta.categoria === 'finalizacao';
-  };
 
   // Monta cartas do jogador e CPU usando a função refatorada
   useEffect(() => {
@@ -49,7 +59,6 @@ export default function ArenaPage() {
     if (!selectedCard) {
       const cartaClicada = playerCards.find(card => card.id === cardId);
       if (cartaClicada) {
-        // Verifica se é uma carta de finalização e se pode jogar
         if (isFinalizacaoCard(cartaClicada) && !canPlayFinalizacao(true)) {
           alert('Você só pode jogar cartas de finalização quando sua barra de progresso estiver em 100%!');
           return;
@@ -73,61 +82,24 @@ export default function ArenaPage() {
       const cartaSelecionada = playerCards.find((c) => c.id === chosenCardId);
       if (!cartaSelecionada) return;
 
-      let cpuCarta: Carta;
-
-      const atualizarProgresso = (playerCard: Carta, cpuCard: Carta) => {
-        // Busca a técnica original para ter acesso às vantagens
-        const playerTecnica = TECNICAS.find(t => t.id === playerCard.id);
-        const cpuTecnica = TECNICAS.find(t => t.id === cpuCard.id);
-
-        if (!playerTecnica || !cpuTecnica) return;
-
-        if (playerTecnica.vantagens.includes(cpuTecnica.id)) {
-          // Jogador tem vantagem -> aumenta progresso do jogador
-          setLeftProgress(prev => Math.min(prev + (playerCard.pontos || 10), 100));
-        } else if (cpuTecnica.vantagens.includes(playerTecnica.id)) {
-          // CPU tem vantagem -> aumenta progresso da CPU
-          setRightProgress(prev => Math.min(prev + (cpuCard.pontos || 10), 100));
-        } else {
-          // Empate - sem alteração no progresso
-        }
-      };
-
-      if (turno === 1) {
-        // Lógica de restrição para Turno 1 (CPU escolhe Queda ou Chamada para Guarda)
-        const categoriasPermitidas: Carta['categoria'][] = ['chamada para guarda', 'queda'];
-        const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
-
-        cpuCarta =
-          opcoesCpu.length > 0
-            ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
-            : cpuCards[Math.floor(Math.random() * cpuCards.length)];
-      } else {
-        // Demais turnos - filtra cartas que podem ser jogadas
-        const cartasJogaveis = cpuCards.filter(carta => {
-          if (isFinalizacaoCard(carta) && !canPlayFinalizacao(false)) {
-            return false; // CPU não pode jogar finalização se progresso não estiver em 100%
-          }
-          return true;
-        });
-
-        // Se não há cartas jogáveis, escolhe qualquer uma (exceto finalização se não puder)
-        if (cartasJogaveis.length === 0) {
-          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
-            cpuCards[Math.floor(Math.random() * cpuCards.length)];
-        } else {
-          cpuCarta = cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
-        }
-      }
-
-      // Atualiza o progresso baseado nas cartas jogadas
-      atualizarProgresso(cartaSelecionada, cpuCarta);
+      // 🎯 LÓGICA DE COMBATE CENTRAL (ESCOLHA DA CPU E ATUALIZAÇÃO DE PROGRESOS) FOI MOVIDA PARA processarTurno
+      const resultado = processarTurno(
+        cartaSelecionada,
+        cpuCards,
+        turno,
+        leftProgress,
+        rightProgress
+      );
+      
+      // Atualiza os estados com base no resultado da lógica de combate
+      setLeftProgress(resultado.novoLeftProgress);
+      setRightProgress(resultado.novoRightProgress);
 
       setActiveCard(cartaSelecionada);
-      setOpponentCard(cpuCarta);
+      setOpponentCard(resultado.cpuCard);
 
       setPlayerCards((prev) => prev.filter((c) => c.id !== cartaSelecionada.id));
-      setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
+      setCpuCards((prev) => prev.filter((c) => c.id !== resultado.cpuCard.id));
 
       setSelectedCard(null);
       setTurno((prev) => prev + 1);
@@ -142,33 +114,8 @@ export default function ArenaPage() {
       setStamina((prev) => prev - staminaCost);
       setForceButtonActive(true);
 
-      let cpuCarta: Carta;
-
-      // RESTRIÇÃO DE TURNO 1 APLICADA AQUI TAMBÉM! 🎯
-      if (turno === 1) {
-        const categoriasPermitidas: Carta['categoria'][] = ['chamada para guarda', 'queda'];
-        const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
-
-        cpuCarta =
-          opcoesCpu.length > 0
-            ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
-            : cpuCards[Math.floor(Math.random() * cpuCards.length)];
-      } else {
-        // Filtra cartas que podem ser jogadas (incluindo verificação de finalização)
-        const cartasJogaveis = cpuCards.filter(carta => {
-          if (isFinalizacaoCard(carta) && !canPlayFinalizacao(false)) {
-            return false;
-          }
-          return true;
-        });
-
-        if (cartasJogaveis.length === 0) {
-          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
-            cpuCards[Math.floor(Math.random() * cpuCards.length)];
-        } else {
-          cpuCarta = cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
-        }
-      }
+      // 🎯 LÓGICA DE JOGADA DA CPU FOI MOVIDA PARA processarJogadaCpu
+      const cpuCarta = processarJogadaCpu(cpuCards, turno, rightProgress);
 
       // Oponente joga
       setOpponentCard(cpuCarta);
@@ -286,10 +233,10 @@ export default function ArenaPage() {
 
           <button
             className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200
-                    ${stamina >= staminaCost
+              ${stamina >= staminaCost
                 ? 'bg-red-600 hover:bg-red-700 active:scale-95'
                 : 'bg-gray-500 cursor-not-allowed'}
-                    ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}`}
+              ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}`}
             onClick={useForceAbility}
             disabled={stamina < staminaCost}
           >
@@ -301,6 +248,7 @@ export default function ArenaPage() {
         <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
           <div className="flex space-x-2 sm:space-x-4">
             {playerCards.map((card) => {
+              // Usa as funções de lógica importadas
               const isFinalizacaoBloqueada = isFinalizacaoCard(card) && !canPlayFinalizacao(true);
 
               return (
