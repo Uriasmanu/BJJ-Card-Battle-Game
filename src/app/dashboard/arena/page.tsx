@@ -17,7 +17,7 @@ import {
   canPlayFinalizacao as canPlayFinalizacaoLogic
 } from '@/lib/gameLogic/combatLogic';
 import { handleConfirmTurn } from '@/lib/gameLogic/arenaHandlers';
-import { useForceAbilityLogic } from '@/lib/gameLogic/forceAbilityLogic';
+import { forceAbilityLogic } from '@/lib/gameLogic/forceAbilityLogic';
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
