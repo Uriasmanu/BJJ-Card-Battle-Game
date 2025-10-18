@@ -51,7 +51,7 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
   const startTimer = (beltId: string) => {
     const fightTime = getBeltFightTime(beltId);
     const beltInfo = getBeltById(beltId);
-    
+
     setCurrentBelt(beltId);
     setCurrentBeltInfo(beltInfo);
     setTimeLeft(fightTime);
@@ -74,22 +74,21 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
 
   // Efeito para decrementar o timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    if (!isRunning) return;
 
-    if (isRunning && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime <= 1) {
-            setIsRunning(false);
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-    }
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          setIsRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
+  }, [isRunning]);
+
 
   const value: TimerContextType = {
     isRunning,
