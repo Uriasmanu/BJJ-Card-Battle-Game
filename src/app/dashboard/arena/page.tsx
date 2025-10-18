@@ -42,11 +42,11 @@ export default function ArenaPage() {
   const [startTimer, setStartTimer] = useState(false);
   const [showOpponentModal, setShowOpponentModal] = useState(false);
 
-  // Novos estados para Força e Estamina
-  const [stamina, setStamina] = useState(100); // Começa com 100 de estamina
-  const [maxStamina] = useState(100); // Estamina máxima
-  const [forceButtonActive, setForceButtonActive] = useState(false); // Estado para o botão de força
-  const staminaCost = 30; // Custo de estamina para o botão de força
+  // Estados de estamina e força
+  const [stamina, setStamina] = useState(100);
+  const [maxStamina] = useState(100);
+  const [forceButtonActive, setForceButtonActive] = useState(false);
+  const staminaCost = 30;
 
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
@@ -71,7 +71,7 @@ export default function ArenaPage() {
     gifUrl: tecnica.gif,
   });
 
-  // Monta cartas do jogador e da CPU
+  // Monta cartas do jogador e CPU
   useEffect(() => {
     const cartasTodas = TECNICAS.map(montarCarta);
     const categorias: Categoria[] = [
@@ -103,8 +103,6 @@ export default function ArenaPage() {
 
     setPlayerCards(player);
     setCpuCards(cpu);
-
-    // Arena pronta, iniciar timer
     setStartTimer(true);
   }, []);
 
@@ -118,59 +116,70 @@ export default function ArenaPage() {
     }
   };
 
-  // Função para usar o botão de força
+  // Confirma a jogada do jogador
+  const handleConfirm = useCallback(
+    (cardId?: string) => {
+      const chosenCardId = cardId ?? selectedCard;
+      if (!chosenCardId) return;
+
+      const cartaSelecionada = playerCards.find((c) => c.id === chosenCardId);
+      if (!cartaSelecionada) return;
+
+      let cpuCarta: Carta;
+      if (turno === 1) {
+        const opcoesCpu = cpuCards.filter((c) => c.categoria === 'queda' || c.categoria === 'guarda');
+        cpuCarta =
+          opcoesCpu.length > 0
+            ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
+            : cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      } else {
+        cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      }
+
+      setActiveCard(cartaSelecionada);
+      setOpponentCard(cpuCarta);
+
+      setPlayerCards((prev) => prev.filter((c) => c.id !== cartaSelecionada.id));
+      setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
+
+      setSelectedCard(null);
+      setTurno((prev) => prev + 1);
+      setForceButtonActive(false);
+    },
+    [selectedCard, playerCards, cpuCards, turno]
+  );
+
+  // Botão de força (pula a vez do jogador)
   const useForceAbility = useCallback(() => {
-    if (stamina >= staminaCost) {
+    if (stamina >= staminaCost && cpuCards.length > 0) {
       setStamina((prev) => prev - staminaCost);
       setForceButtonActive(true);
+
+      // Oponente joga sozinho
+      const cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      setOpponentCard(cpuCarta);
+
+      setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
+
+      // Nenhuma carta do jogador é exibida
+      setActiveCard(null);
+
+      setTurno((prev) => prev + 1);
+
       setTimeout(() => setForceButtonActive(false), 2000);
-    } else {
+    } else if (stamina < staminaCost) {
       alert('Estamina insuficiente!');
     }
-  }, [stamina, staminaCost]);
+  }, [stamina, staminaCost, cpuCards]);
 
-  // Efeito para regenerar estamina
+  // Regeneração de estamina
   useEffect(() => {
-    const staminaRegenInterval = setInterval(() => {
-      setStamina((prev) => Math.min(prev + 15, maxStamina)); // Regenera 5 de estamina a cada X segundos
-    }, 60000); // A cada 1 mim
+    const interval = setInterval(() => {
+      setStamina((prev) => Math.min(prev + 5, maxStamina));
+    }, 30000);
 
-    return () => clearInterval(staminaRegenInterval);
+    return () => clearInterval(interval);
   }, [maxStamina]);
-
-  const handleConfirm = () => {
-    if (!selectedCard) return;
-
-    const cartaSelecionada = playerCards.find((c) => c.id === selectedCard);
-    if (!cartaSelecionada) return;
-
-    // Escolha da CPU
-    let cpuCarta: Carta;
-    if (turno === 1) {
-      const opcoesCpu = cpuCards.filter((c) => c.categoria === 'queda' || c.categoria === 'guarda');
-      cpuCarta =
-        opcoesCpu.length > 0
-          ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
-          : cpuCards[Math.floor(Math.random() * cpuCards.length)];
-    } else {
-      cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
-    }
-
-    // Atualiza arena
-    setActiveCard(cartaSelecionada);
-    setOpponentCard(cpuCarta);
-
-    // Remove cartas usadas
-    setPlayerCards((prev) => prev.filter((c) => c.id !== selectedCard));
-    setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
-
-    // Libera seleção e aumenta turno
-    setSelectedCard(null);
-    setTurno((prev) => prev + 1);
-
-    // Resetar estado de força se for uma habilidade por turno
-    setForceButtonActive(false);
-  };
 
   return (
     <div className="min-h-screen bg-white relative overflow-x-hidden">
@@ -238,7 +247,6 @@ export default function ArenaPage() {
 
         {/* Barra de Estamina e Botão de Força */}
         <div className="absolute bottom-52 sm:bottom-28 right-4 z-40 flex flex-col items-center space-y-2">
-          {/* Barra de Estamina */}
           <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden flex items-center relative">
             <div
               className="bg-green-500 h-full rounded-full transition-all duration-300"
@@ -249,22 +257,19 @@ export default function ArenaPage() {
             </div>
           </div>
 
-          {/* Botão de Força */}
           <button
             className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200
                         ${stamina >= staminaCost
                           ? 'bg-red-600 hover:bg-red-700 active:scale-95'
                           : 'bg-gray-500 cursor-not-allowed'
                         }
-                        ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}
-                      `}
+                        ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}`}
             onClick={useForceAbility}
             disabled={stamina < staminaCost}
           >
             <HandFist className="text-white text-2xl" />
           </button>
         </div>
-
 
         {/* Player Hand */}
         <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
@@ -307,7 +312,7 @@ export default function ArenaPage() {
                   <div className="mt-4 flex justify-center space-x-4">
                     <button
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
-                      onClick={handleConfirm}
+                      onClick={() => handleConfirm()}
                     >
                       Selecionar para o Centro
                     </button>
