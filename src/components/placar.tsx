@@ -14,7 +14,6 @@ export default function Placar({
   const { 
     formattedTime, 
     isRunning, 
-    currentBeltInfo 
   } = useTimer();
 
   return (

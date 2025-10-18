@@ -1,13 +1,13 @@
 export interface Tecnica {
   id: string;
   nome: string;
-  categoria: 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa'| 'chamada para guarda' | 'estabilização';
+  categoria: 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa' | 'chamada para guarda' | 'estabilização';
   dificuldade: 'facil' | 'intermediario' | 'dificil';
   pontos?: 2 | 3 | 4;
   descricao: string;
-  faixa: 'branca' | 'azul' | 'roxa' | '(Todas)'; 
+  faixa: 'branca' | 'azul' | 'roxa' | '(Todas)';
   defesas: string[];
-  proximosMovimentos?: string[]; 
+  proximosMovimentos?: string[];
   gif?: string;
   imagem?: string;
 }
@@ -70,17 +70,17 @@ export const CORES_CATEGORIA = {
     icone: '🛡️'
   },
   // NOVAS CATEGORIAS ADICIONADAS
-  'chamada para guarda': { 
-      cor: '#9CA3AF', 
-      classe: 'text-gray-500 bg-gray-100 border-gray-300', 
-      gradiente: 'from-gray-400 to-gray-500', 
-      icone: '🪂' 
+  'chamada para guarda': {
+    cor: '#9CA3AF',
+    classe: 'text-gray-500 bg-gray-100 border-gray-300',
+    gradiente: 'from-gray-400 to-gray-500',
+    icone: '🪂'
   },
-  'estabilização': { 
-      cor: '#0891B2', 
-      classe: 'text-cyan-600 bg-cyan-100 border-cyan-300', 
-      gradiente: 'from-cyan-500 to-cyan-600', 
-      icone: '🛑' 
+  'estabilização': {
+    cor: '#0891B2',
+    classe: 'text-cyan-600 bg-cyan-100 border-cyan-300',
+    gradiente: 'from-cyan-500 to-cyan-600',
+    icone: '🛑'
   }
 };
 
@@ -102,7 +102,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['fuga-de-quadril', 'ponte-sobre-ombro'],
-    ...getAssetPaths('rolamento-frente'),
+    ...getAssetPaths(''),
   },
   {
     id: 'rolamento-de-costa',
@@ -113,7 +113,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['levantada-tecnica'],
-    ...getAssetPaths('rolamento-costa'),
+    ...getAssetPaths(''),
   },
   {
     id: 'rolamento-lateral',
@@ -124,7 +124,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['fuga-de-quadril'],
-    ...getAssetPaths('rolamento-lateral'),
+    ...getAssetPaths(''),
   },
   {
     id: 'fuga-de-quadril',
@@ -135,7 +135,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['guarda-fechada', 'meia-guarda'],
-    ...getAssetPaths('fuga-quadril'),
+    ...getAssetPaths(''),
   },
   {
     id: 'ponte-sobre-ombro',
@@ -146,7 +146,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['tirando-adversario-montada'],
-    ...getAssetPaths('ponte-ombro'),
+    ...getAssetPaths(''),
   },
   {
     id: 'levantada-tecnica',
@@ -157,7 +157,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['double-leg-em-pe', 'single-leg'],
-    ...getAssetPaths('levantada-tecnica'),
+    ...getAssetPaths(''),
   },
 
   // GUARDAS
@@ -170,7 +170,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['passagem-guarda-emborcado'],
     proximosMovimentos: ['raspagem-guarda-fechada-1', 'kimura-guarda-fechada'],
-    ...getAssetPaths('guarda-fechada'),
+    ...getAssetPaths(''),
   },
   {
     id: 'guarda-aranha',
@@ -181,7 +181,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['passagem-guarda-toreando'],
     proximosMovimentos: ['raspagem-guarda-aranha-1', 'raspagem-guarda-aranha-2'],
-    ...getAssetPaths('guarda-aranha'),
+    ...getAssetPaths(''),
   },
   {
     id: 'meia-guarda',
@@ -192,7 +192,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['passagem-meia-guarda'],
     proximosMovimentos: ['raspagem-meia-guarda-1', 'raspagem-meia-guarda-2'],
-    ...getAssetPaths('meia-guarda'),
+    ...getAssetPaths(''),
   },
 
   // RASPAGENS - GUARDA FECHADA
@@ -206,7 +206,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-raspagem-basica'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('raspagem-fechada-1'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-guarda-fechada-2',
@@ -218,7 +218,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-raspagem-tesoura'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('raspagem-fechada-2'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-guarda-fechada-3',
@@ -230,7 +230,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-raspagem-joelho'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('raspagem-fechada-3'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-guarda-fechada-4',
@@ -242,7 +242,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-raspagem-circular'],
     proximosMovimentos: ['lateral'],
-    ...getAssetPaths('raspagem-fechada-4'),
+    ...getAssetPaths(''),
   },
 
   // RASPAGENS - GUARDA ARANHA
@@ -256,7 +256,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-chicote'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('raspagem-aranha-1'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-guarda-aranha-2',
@@ -268,7 +268,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-giro-180'],
     proximosMovimentos: ['lateral', 'joelho-barriga'],
-    ...getAssetPaths('raspagem-aranha-2'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-guarda-aranha-3',
@@ -280,7 +280,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-giro-360'],
     proximosMovimentos: ['lateral', 'joelho-barriga'],
-    ...getAssetPaths('raspagem-aranha-3'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-guarda-aranha-4',
@@ -292,7 +292,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-pegada-pernas'],
     proximosMovimentos: ['guarda', 'lateral'],
-    ...getAssetPaths('raspagem-aranha-4'),
+    ...getAssetPaths(''),
   },
 
   // RASPAGENS - MEIA GUARDA
@@ -306,7 +306,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-joga-fora'],
     proximosMovimentos: ['lateral'],
-    ...getAssetPaths('raspagem-meia-1'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-meia-guarda-2',
@@ -318,7 +318,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-fuga-costas'],
     proximosMovimentos: ['costas'],
-    ...getAssetPaths('raspagem-meia-2'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-meia-guarda-3',
@@ -330,7 +330,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-fio-dental'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('raspagem-meia-3'),
+    ...getAssetPaths(''),
   },
   {
     id: 'raspagem-meia-guarda-4',
@@ -342,7 +342,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-levantada'],
     proximosMovimentos: ['lateral', 'meia-guarda'],
-    ...getAssetPaths('raspagem-meia-4'),
+    ...getAssetPaths(''),
   },
 
   // QUEDAS
@@ -368,7 +368,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-double-leg-ajoelhado'],
     proximosMovimentos: ['passagem-de-guarda'],
-    ...getAssetPaths('double-leg-ajoelhado'),
+    ...getAssetPaths(''),
   },
   {
     id: 'single-leg',
@@ -394,7 +394,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-passagem-emborcado'],
     proximosMovimentos: ['lateral'],
-    ...getAssetPaths('passagem-emborcado'),
+    ...getAssetPaths(''),
   },
   {
     id: 'passagem-guarda-toreando',
@@ -406,7 +406,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-passagem-toreando'],
     proximosMovimentos: ['lateral'],
-    ...getAssetPaths('passagem-toreando'),
+    ...getAssetPaths(''),
   },
   {
     id: 'passagem-guarda-empurrando-joelho',
@@ -418,7 +418,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-passagem-joelho'],
     proximosMovimentos: ['joelho-barriga', 'lateral'],
-    ...getAssetPaths('passagem-joelho'),
+    ...getAssetPaths(''),
   },
 
   // FINALIZAÇÕES
@@ -431,129 +431,129 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-triangulo'],
     proximosMovimentos: ['armlock-guarda-fechada'],
-    ...getAssetPaths('triangulo'),
+    ...getAssetPaths(''),
   },
   // 🆕 TÉCNICAS ADICIONADAS
 
-// JOELHO NA BARRIGA (Knee on Belly)
-{
-  id: 'joelho-barriga',
-  nome: 'Joelho na Barriga',
-  categoria: 'estabilização',
-  dificuldade: 'intermediario',
-  pontos: 2,
-  descricao: 'Posição de controle com um joelho sobre o abdômen do oponente e outro afastado para equilíbrio.',
-  faixa: '(Todas)',
-  defesas: ['defesa-joelho-barriga'],
-  proximosMovimentos: ['montada', 'americana-lateral'],
-  ...getAssetPaths('joelho-barriga'),
-},
+  // JOELHO NA BARRIGA (Knee on Belly)
+  {
+    id: 'joelho-barriga',
+    nome: 'Joelho na Barriga',
+    categoria: 'estabilização',
+    dificuldade: 'intermediario',
+    pontos: 2,
+    descricao: 'Posição de controle com um joelho sobre o abdômen do oponente e outro afastado para equilíbrio.',
+    faixa: '(Todas)',
+    defesas: ['defesa-joelho-barriga'],
+    proximosMovimentos: ['montada', 'americana-lateral'],
+    ...getAssetPaths(''),
+  },
 
-// MONTADA
-{
-  id: 'montada',
-  nome: 'Montada',
-  categoria: 'estabilização',
-  dificuldade: 'facil',
-  pontos: 4,
-  descricao: 'Posição dominante sentada sobre o tórax do adversário com controle dos quadris e ombros.',
-  faixa: '(Todas)',
-  defesas: ['tirando-adversario-montada'],
-  proximosMovimentos: ['americana-montada', 'estrangulamento-montada'],
-  ...getAssetPaths('montada'),
-},
+  // MONTADA
+  {
+    id: 'montada',
+    nome: 'Montada',
+    categoria: 'estabilização',
+    dificuldade: 'facil',
+    pontos: 4,
+    descricao: 'Posição dominante sentada sobre o tórax do adversário com controle dos quadris e ombros.',
+    faixa: '(Todas)',
+    defesas: ['tirando-adversario-montada'],
+    proximosMovimentos: ['americana-montada', 'estrangulamento-montada'],
+    ...getAssetPaths(''),
+  },
 
-// PEGADA DE COSTAS COM GANCHOS
-{
-  id: 'costas',
-  nome: 'Pegada de Costas com Ganchos',
-  categoria: 'estabilização',
-  dificuldade: 'intermediario',
-  pontos: 4,
-  descricao: 'Controle total das costas do adversário com ambos os ganchos e controle do tronco.',
-  faixa: '(Todas)',
-  defesas: ['tirando-adversario-costas'],
-  proximosMovimentos: ['mata-leao', 'estrangulamento-costas'],
-  ...getAssetPaths('costas'),
-},
+  // PEGADA DE COSTAS COM GANCHOS
+  {
+    id: 'costas',
+    nome: 'Pegada de Costas com Ganchos',
+    categoria: 'estabilização',
+    dificuldade: 'intermediario',
+    pontos: 4,
+    descricao: 'Controle total das costas do adversário com ambos os ganchos e controle do tronco.',
+    faixa: '(Todas)',
+    defesas: ['tirando-adversario-costas'],
+    proximosMovimentos: ['mata-leao', 'estrangulamento-costas'],
+    ...getAssetPaths(''),
+  },
 
-// OMOPLATA
-{
-  id: 'omoplata',
-  nome: 'Omoplata',
-  categoria: 'finalizacao',
-  dificuldade: 'intermediario',
-  descricao: 'Chave de ombro aplicada da guarda, usando as pernas para girar o oponente.',
-  faixa: '(Todas)',
-  defesas: ['defesa-omoplata'],
-  proximosMovimentos: ['estrangulamento-reto-guarda'],
-  ...getAssetPaths('omoplata'),
-},
+  // OMOPLATA
+  {
+    id: 'omoplata',
+    nome: 'Omoplata',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Chave de ombro aplicada da guarda, usando as pernas para girar o oponente.',
+    faixa: '(Todas)',
+    defesas: ['defesa-omoplata'],
+    proximosMovimentos: ['estrangulamento-reto-guarda'],
+    ...getAssetPaths(''),
+  },
 
-// EZEQUIEL CHOKE
-{
-  id: 'ezequiel-choke',
-  nome: 'Ezequiel Choke',
-  categoria: 'finalizacao',
-  dificuldade: 'intermediario',
-  descricao: 'Estrangulamento aplicado de dentro da guarda ou da montada usando a própria manga e antebraço.',
-  faixa: '(Todas)',
-  defesas: ['defesa-ezequiel'],
-  proximosMovimentos: ['montada', 'lateral'],
-  ...getAssetPaths('ezequiel-choke'),
-},
+  // EZEQUIEL CHOKE
+  {
+    id: 'ezequiel-choke',
+    nome: 'Ezequiel Choke',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento aplicado de dentro da guarda ou da montada usando a própria manga e antebraço.',
+    faixa: '(Todas)',
+    defesas: ['defesa-ezequiel'],
+    proximosMovimentos: ['montada', 'lateral'],
+    ...getAssetPaths(''),
+  },
 
-// ESTRANGULAMENTO COM GOLA (Lapel Choke)
-{
-  id: 'estrangulamento-com-gola',
-  nome: 'Estrangulamento com Gola (Lapel Choke)',
-  categoria: 'finalizacao',
-  dificuldade: 'intermediario',
-  descricao: 'Estrangulamento com o uso da gola do kimono, realizado de várias posições de controle.',
-  faixa: '(Todas)',
-  defesas: ['defesa-estrangulamento-com-gola'],
-  proximosMovimentos: ['montada', 'costas'],
-  ...getAssetPaths('estrangulamento-com-gola'),
-},
+  // ESTRANGULAMENTO COM GOLA (Lapel Choke)
+  {
+    id: 'estrangulamento-com-gola',
+    nome: 'Estrangulamento com Gola (Lapel Choke)',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento com o uso da gola do kimono, realizado de várias posições de controle.',
+    faixa: '(Todas)',
+    defesas: ['defesa-estrangulamento-com-gola'],
+    proximosMovimentos: ['montada', 'costas'],
+    ...getAssetPaths(''),
+  },
 
-// GUILHOTINA
-{
-  id: 'guillotine',
-  nome: 'Guilhotina',
-  categoria: 'finalizacao',
-  dificuldade: 'intermediario',
-  descricao: 'Estrangulamento frontal com o braço em torno do pescoço, usado ao defender quedas.',
-  faixa: '(Todas)',
-  defesas: ['defesa-guillotine'],
-  proximosMovimentos: ['montada', 'lateral'],
-  ...getAssetPaths('guillotine'),
-},
+  // GUILHOTINA
+  {
+    id: 'guillotine',
+    nome: 'Guilhotina',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento frontal com o braço em torno do pescoço, usado ao defender quedas.',
+    faixa: '(Todas)',
+    defesas: ['defesa-guillotine'],
+    proximosMovimentos: ['montada', 'lateral'],
+    ...getAssetPaths(''),
+  },
 
-// CROSS COLLAR CHOKE
-{
-  id: 'estrangulamento-cruzado',
-  nome: 'Estrangulamento Cruzado (Cross Collar Choke)',
-  categoria: 'finalizacao',
-  dificuldade: 'intermediario',
-  descricao: 'Estrangulamento com as mãos cruzadas na gola do adversário, aplicando pressão lateral no pescoço.',
-  faixa: '(Todas)',
-  defesas: ['defesa-estrangulamento-cruzado'],
-  proximosMovimentos: ['montada'],
-  ...getAssetPaths('estrangulamento-cruzado'),
-},
+  // CROSS COLLAR CHOKE
+  {
+    id: 'estrangulamento-cruzado',
+    nome: 'Estrangulamento Cruzado (Cross Collar Choke)',
+    categoria: 'finalizacao',
+    dificuldade: 'intermediario',
+    descricao: 'Estrangulamento com as mãos cruzadas na gola do adversário, aplicando pressão lateral no pescoço.',
+    faixa: '(Todas)',
+    defesas: ['defesa-estrangulamento-cruzado'],
+    proximosMovimentos: ['montada'],
+    ...getAssetPaths(''),
+  },
 
-// BOW AND ARROW CHOKE
-{
-  id: 'estrangulamento-lapeira',
-  nome: 'Estrangulamento de Lapeira (Bow and Arrow Choke)',
-  categoria: 'finalizacao',
-  dificuldade: 'dificil',
-  descricao: 'Estrangulamento aplicado pelas costas puxando a gola e estendendo o corpo como um arco.',
-  faixa: '(Todas)',
-  defesas: ['defesa-estrangulamento-lapeira'],
-  proximosMovimentos: ['costas'],
-  ...getAssetPaths('estrangulamento-lapeira'),
-},
+  // BOW AND ARROW CHOKE
+  {
+    id: 'estrangulamento-lapeira',
+    nome: 'Estrangulamento de Lapeira (Bow and Arrow Choke)',
+    categoria: 'finalizacao',
+    dificuldade: 'dificil',
+    descricao: 'Estrangulamento aplicado pelas costas puxando a gola e estendendo o corpo como um arco.',
+    faixa: '(Todas)',
+    defesas: ['defesa-estrangulamento-lapeira'],
+    proximosMovimentos: ['costas'],
+    ...getAssetPaths(''),
+  },
 
   {
     id: 'estrangulamento-montada',
@@ -564,7 +564,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-estrangulamento-montada'],
     proximosMovimentos: ['armlock-montada'],
-    ...getAssetPaths('estrangulamento-montada'),
+    ...getAssetPaths(''),
   },
   {
     id: 'armlock-montada',
@@ -586,7 +586,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-americana-montada'],
     proximosMovimentos: ['estrangulamento-montada'],
-    ...getAssetPaths('americana-montada'),
+    ...getAssetPaths(''),
   },
   {
     id: 'estrangulamento-armlock-montada',
@@ -597,7 +597,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-combinacao-montada'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('estrangulamento-armlock'),
+    ...getAssetPaths(''),
   },
   {
     id: 'kimura-guarda-fechada',
@@ -608,7 +608,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-kimura-guarda'],
     proximosMovimentos: ['estrangulamento-reto-guarda'],
-    ...getAssetPaths('kimura-guarda'),
+    ...getAssetPaths(''),
   },
   {
     id: 'estrangulamento-reto-guarda',
@@ -619,7 +619,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-estrangulamento-reto'],
     proximosMovimentos: ['armlock-guarda-fechada'],
-    ...getAssetPaths('estrangulamento-reto-guarda'),
+    ...getAssetPaths(''),
   },
   {
     id: 'armlock-guarda-fechada',
@@ -630,7 +630,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-armlock-guarda'],
     proximosMovimentos: ['triangulo'],
-    ...getAssetPaths('armlock-guarda'),
+    ...getAssetPaths(''),
   },
   {
     id: 'americana-lateral',
@@ -641,7 +641,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-americana-lateral'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('americana-lateral'),
+    ...getAssetPaths(''),
   },
   {
     id: 'americana-invertida-lateral',
@@ -652,7 +652,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-kimura-lateral'],
     proximosMovimentos: ['montada'],
-    ...getAssetPaths('kimura-lateral'),
+    ...getAssetPaths(''),
   },
   {
     id: 'estrangulamento-costas',
@@ -663,7 +663,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-estrangulamento-costas'],
     proximosMovimentos: ['mata-leao'],
-    ...getAssetPaths('estrangulamento-costas'),
+    ...getAssetPaths(''),
   },
   {
     id: 'mata-leao',
@@ -674,7 +674,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-mata-leao'],
     proximosMovimentos: ['costas'],
-    ...getAssetPaths('mata-leao'),
+    ...getAssetPaths(''),
   },
   {
     id: 'estrangulamento-relogio',
@@ -685,7 +685,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: ['defesa-estrangulamento-relogio'],
     proximosMovimentos: ['costas'],
-    ...getAssetPaths('estrangulamento-relogio'),
+    ...getAssetPaths(''),
   },
 
   // DEFESAS E SAÍDAS
@@ -698,7 +698,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['guarda-fechada'],
-    ...getAssetPaths('defesa-montada'),
+    ...getAssetPaths(''),
   },
   {
     id: 'tirando-adversario-lateral',
@@ -709,7 +709,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['guarda', 'meia-guarda'],
-    ...getAssetPaths('defesa-lateral'),
+    ...getAssetPaths(''),
   },
   {
     id: 'tirando-adversario-costas',
@@ -720,7 +720,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['lateral'],
-    ...getAssetPaths('defesa-costas'),
+    ...getAssetPaths(''),
   },
   {
     id: 'defesa-estrangulamento-guarda',
@@ -731,7 +731,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['raspagem-guarda-fechada-1'],
-    ...getAssetPaths('defesa-estrangulamento-guarda'),
+    ...getAssetPaths(''),
   },
   {
     id: 'defesa-armlock-montada',
@@ -742,7 +742,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['guarda'],
-    ...getAssetPaths('defesa-armlock-montada'),
+    ...getAssetPaths(''),
   },
   {
     id: 'defesa-kimura-guarda',
@@ -753,7 +753,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: ['passagem-de-guarda'],
-    ...getAssetPaths('defesa-kimura-guarda'),
+    ...getAssetPaths(''),
   },
 
   // TÉCNICAS EXISTENTES (mantidas para compatibilidade)
@@ -766,7 +766,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     defesas: [],
     proximosMovimentos: [],
-    ...getAssetPaths('armlock'),
+    ...getAssetPaths(''),
   },
   {
     id: 'defesa-double-leg-em-pe',
@@ -779,7 +779,7 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['guarda-fechada'],
     ...getAssetPaths('defesa-double-leg-em-pe'),
   },
-   {
+  {
     id: 'jacare-banguela',
     nome: 'Jacare Banguela (Uki waza)',
     categoria: 'queda',
@@ -801,7 +801,7 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths('defesa-single-leg'),
   },
-]; // Fechamento correto do array TECNICAS
+]; 
 
 // Funções auxiliares
 export const obterTecnicasPorFaixa = (faixa: string): Tecnica[] =>

@@ -1,20 +1,15 @@
-// contexts/TimerContext.tsx
 'use client';
 
-import { Belt, getBeltById } from '@/lib/constants/belts'; // Presumindo que você tem este arquivo
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
 
 interface TimerContextType {
   isRunning: boolean;
   timeLeft: number;
-  currentBelt: string;
-  startTimer: (beltId: string) => void;
+  startTimer: () => void;
   stopTimer: () => void;
   resetTimer: () => void;
   toggleTimer: () => void;
   formattedTime: string;
-  currentBeltInfo: Belt | undefined;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -25,67 +20,26 @@ interface TimerProviderProps {
 
 export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
   const [isRunning, setIsRunning] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [currentBelt, setCurrentBelt] = useState('white');
-  const [initialTime, setInitialTime] = useState(0);
-  const [currentBeltInfo, setCurrentBeltInfo] = useState<Belt | undefined>(getBeltById('white'));
+  const [timeLeft, setTimeLeft] = useState(180); // Sempre 3 minutos
+  const [initialTime] = useState(180);
 
-  // Função para obter o tempo de luta em segundos baseado na faixa
-  const getBeltFightTime = (beltId: string): number => {
-    const belt = getBeltById(beltId);
-    if (!belt) {
-      const defaultBelt = getBeltById('white');
-      return defaultBelt ? defaultBelt.fightTime * 60 : 5 * 60;
-    }
-    return belt.fightTime * 60; // Converte minutos para segundos
-  };
-
-  // Formatar tempo para MM:SS
-  const formatTime = (seconds: number): string => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const startTimer = (beltId: string) => {
-    const fightTime = getBeltFightTime(beltId);
-    const beltInfo = getBeltById(beltId);
-
-    setCurrentBelt(beltId);
-    setCurrentBeltInfo(beltInfo);
-    setTimeLeft(fightTime);
-    setInitialTime(fightTime);
-    setIsRunning(true);
-  };
-
-  const stopTimer = () => {
-    setIsRunning(false);
-  };
-
+  const startTimer = () => setIsRunning(true);
+  const stopTimer = () => setIsRunning(false);
   const resetTimer = () => {
     setIsRunning(false);
-    setTimeLeft(initialTime > 0 ? initialTime : getBeltFightTime(currentBelt));
+    setTimeLeft(initialTime);
   };
+  const toggleTimer = () => setIsRunning(prev => !prev);
 
-  const toggleTimer = () => {
-    setIsRunning(!isRunning);
-  };
-
-  // --- CORREÇÃO DE INICIALIZAÇÃO PARA AMBIENTE DE PRODUÇÃO (VERCEL) ---
-  // Garante que o estado inicial (timeLeft e initialTime) seja definido
-  // corretamente após a montagem do componente no lado do cliente.
+  // Timer — intervalo só depende de isRunning
   useEffect(() => {
-    if (initialTime === 0) {
-      const initialFightTime = getBeltFightTime(currentBelt);
-      setInitialTime(initialFightTime);
-      setTimeLeft(initialFightTime);
-    }
-    // Este efeito roda na montagem e se initialTime for 0
-  }, [initialTime, currentBelt]);
-
-
-  useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return;
+    if (!isRunning) return;
 
     const interval = setInterval(() => {
       setTimeLeft(prev => {
@@ -98,15 +52,11 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
-
-
+  }, [isRunning]);
 
   const value: TimerContextType = {
     isRunning,
     timeLeft,
-    currentBelt,
-    currentBeltInfo,
     startTimer,
     stopTimer,
     resetTimer,
@@ -114,17 +64,11 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
     formattedTime: formatTime(timeLeft),
   };
 
-  return (
-    <TimerContext.Provider value={value}>
-      {children}
-    </TimerContext.Provider>
-  );
+  return <TimerContext.Provider value={value}>{children}</TimerContext.Provider>;
 };
 
 export const useTimer = (): TimerContextType => {
   const context = useContext(TimerContext);
-  if (context === undefined) {
-    throw new Error('useTimer must be used within a TimerProvider');
-  }
+  if (!context) throw new Error('useTimer must be used within a TimerProvider');
   return context;
 };
