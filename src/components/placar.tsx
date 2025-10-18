@@ -1,6 +1,7 @@
 'use client';
 
 import { useTimer } from '@/contexts/TimerContext';
+import { useEffect } from 'react';
 
 interface PlacarProps {
   leftPlayer?: { name: string; score: number };
@@ -13,8 +14,16 @@ export default function Placar({
 }: PlacarProps) {
   const { 
     formattedTime, 
-    isRunning, 
+    isRunning 
   } = useTimer();
+
+  // Debug no placar
+  useEffect(() => {
+    console.log('📊 Placar atualizado:', {
+      formattedTime,
+      isRunning
+    });
+  }, [formattedTime, isRunning]);
 
   return (
     <div className="relative w-[14rem] max-w-full mx-auto">
@@ -74,7 +83,6 @@ export default function Placar({
         </div>
 
       </div>
-
     </div>
   );
 }
