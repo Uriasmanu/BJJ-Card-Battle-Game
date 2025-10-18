@@ -107,6 +107,27 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
   {
+    id: 'chamada-de-guarda',
+    nome: 'Chamada de Guarda',
+    categoria: 'chamada para guarda',
+    dificuldade: 'intermediario',
+    descricao: 'Movimento usado para puxar o oponente para dentro da guarda, controlando sua postura e iniciando o jogo por baixo.',
+    faixa: '(Todas)',
+    vantagens: [],
+    defesas: [
+      'Base baixa',
+      'Postura firme',
+      'Quebra de pegada'
+    ],
+    proximosMovimentos: [
+      'guarda-fechada',
+      'guarda-aberta',
+      'raspagem-básica'
+    ],
+    ...getAssetPaths('chamada-de-guarda'),
+  },
+
+  {
     id: 'rolamento-de-costa',
     nome: 'Rolamento de Costa',
     categoria: 'defesa',
@@ -389,7 +410,7 @@ export const TECNICAS: Tecnica[] = [
     pontos: 2,
     descricao: 'Queda agarrando ambas as pernas do adversário ajoelhado',
     faixa: '(Todas)',
-    vantagens: ['jacare-banguela'],
+    vantagens: [],
     defesas: ['defesa-double-leg-ajoelhado'],
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths(''),

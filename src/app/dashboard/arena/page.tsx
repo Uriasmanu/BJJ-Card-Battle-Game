@@ -6,9 +6,9 @@ import Placar from '@/components/placar';
 import { useState, useEffect, useCallback } from 'react';
 import { HandFist, Zap } from 'lucide-react';
 import { distribuirCartasIniciais, Carta } from '@/lib/gameLogic/cardSetup';
-import { 
-  isFinalizacaoCard as isFinalizacaoCardLogic, 
-  canPlayFinalizacao as canPlayFinalizacaoLogic 
+import {
+  isFinalizacaoCard as isFinalizacaoCardLogic,
+  canPlayFinalizacao as canPlayFinalizacaoLogic
 } from '@/lib/gameLogic/combatLogic';
 import { handleConfirmTurn } from '@/lib/gameLogic/arenaHandlers';
 import { useForceAbilityLogic } from '@/lib/gameLogic/forceAbilityLogic'; // Importação da lógica refatorada
@@ -180,10 +180,10 @@ export default function ArenaPage() {
           <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
             <div className="rounded-xl p-4 sm:p-6 border border-white/10">
               <div className="flex justify-center items-center space-x-4">
-                {opponentCard && (
-                  <div className="transform scale-90 lg:scale-100 cursor-pointer" onClick={handleOpponentCardClick}>
-                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes />
-                    <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
+                {activeCard && (
+                  <div className="transform scale-90 lg:scale-100">
+                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes />
+                    <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
                   </div>
                 )}
 
@@ -195,10 +195,10 @@ export default function ArenaPage() {
                   </div>
                 )}
 
-                {activeCard && (
-                  <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes />
-                    <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
+                {opponentCard && (
+                  <div className="transform scale-90 lg:scale-100 cursor-pointer" onClick={handleOpponentCardClick}>
+                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes />
+                    <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                   </div>
                 )}
               </div>
