@@ -4,33 +4,9 @@ import CardBatalha from '@/components/cardBatalha';
 import CardTecnica from '@/components/cardTecnica';
 import Placar from '@/components/placar';
 import { useState, useEffect, useCallback } from 'react';
-import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
+import { TECNICAS } from '@/lib/constants/techniques';
 import { HandFist, Zap } from 'lucide-react';
-
-type Dificuldade = 'facil' | 'intermediario' | 'dificil';
-type Categoria =
-  | 'guarda'
-  | 'passagem'
-  | 'finalizacao'
-  | 'raspagem'
-  | 'queda'
-  | 'defesa'
-  | 'chamada para guarda'
-  | 'estabilização';
-
-interface Carta {
-  id: string;
-  titulo: string;
-  categoria: Categoria;
-  descricao: string;
-  faixa: string;
-  pontos: number;
-  corCategoria: string;
-  dificuldade: Dificuldade;
-  corDificuldade: string;
-  imagemUrl?: string;
-  gifUrl?: string;
-}
+import { distribuirCartasIniciais, Carta } from '@/lib/gameLogic/cardSetup';
 
 export default function ArenaPage() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -61,79 +37,12 @@ export default function ArenaPage() {
     return carta.categoria === 'finalizacao';
   };
 
-  const embaralhar = (array: Carta[]) => {
-    const novoArray = [...array];
-    for (let i = novoArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [novoArray[i], novoArray[j]] = [novoArray[j], novoArray[i]];
-    }
-    return novoArray;
-  };
-
-  const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
-    id: tecnica.id,
-    titulo: tecnica.nome,
-    categoria: tecnica.categoria as Categoria,
-    descricao: tecnica.descricao,
-    faixa: tecnica.faixa,
-    pontos: tecnica.pontos ?? 0,
-    corCategoria: obterCorCategoria(tecnica.categoria).cor,
-    dificuldade: tecnica.dificuldade as Dificuldade,
-    corDificuldade: obterCorDificuldade(tecnica.dificuldade).cor,
-    imagemUrl: tecnica.imagem,
-    gifUrl: tecnica.gif,
-  });
-
-  // Monta cartas do jogador e CPU
+  // Monta cartas do jogador e CPU usando a função refatorada
   useEffect(() => {
-    const cartasTodas = TECNICAS.map(montarCarta);
-    const categorias: Categoria[] = [
-      'guarda',
-      'passagem',
-      'finalizacao',
-      'raspagem',
-      'queda',
-      'defesa',
-      'chamada para guarda',
-      'estabilização',
-    ];
-
-    const player: Carta[] = [];
-    const cpu: Carta[] = [];
-
-    categorias.forEach((categoria) => {
-      const cartasCategoria = cartasTodas.filter((c) => c.categoria === categoria);
-      const embaralhadas = embaralhar(cartasCategoria);
-
-      if (embaralhadas.length > 0) {
-        const cartaPlayer = embaralhadas[0];
-        const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : null;
-
-        player.push(cartaPlayer);
-        if (cartaCpu) cpu.push(cartaCpu);
-      }
-    });
-
-    setPlayerCards(player);
-    setCpuCards(cpu);
+    const { playerCards, cpuCards } = distribuirCartasIniciais();
+    setPlayerCards(playerCards);
+    setCpuCards(cpuCards);
     setStartTimer(true);
-  }, []);
-
-  // Efeito para as barras de progresso aumentarem a cada 5 segundos
-  useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setLeftProgress(prev => {
-        const newProgress = prev + 10;
-        return newProgress > 100 ? 100 : newProgress;
-      });
-
-      setRightProgress(prev => {
-        const newProgress = prev + 10;
-        return newProgress > 100 ? 100 : newProgress;
-      });
-    }, 5000);
-
-    return () => clearInterval(progressInterval);
   }, []);
 
   const handleCardClick = (cardId: string) => {
@@ -166,9 +75,27 @@ export default function ArenaPage() {
 
       let cpuCarta: Carta;
 
+      const atualizarProgresso = (playerCard: Carta, cpuCard: Carta) => {
+        // Busca a técnica original para ter acesso às vantagens
+        const playerTecnica = TECNICAS.find(t => t.id === playerCard.id);
+        const cpuTecnica = TECNICAS.find(t => t.id === cpuCard.id);
+
+        if (!playerTecnica || !cpuTecnica) return;
+
+        if (playerTecnica.vantagens.includes(cpuTecnica.id)) {
+          // Jogador tem vantagem -> aumenta progresso do jogador
+          setLeftProgress(prev => Math.min(prev + (playerCard.pontos || 10), 100));
+        } else if (cpuTecnica.vantagens.includes(playerTecnica.id)) {
+          // CPU tem vantagem -> aumenta progresso da CPU
+          setRightProgress(prev => Math.min(prev + (cpuCard.pontos || 10), 100));
+        } else {
+          // Empate - sem alteração no progresso
+        }
+      };
+
       if (turno === 1) {
         // Lógica de restrição para Turno 1 (CPU escolhe Queda ou Chamada para Guarda)
-        const categoriasPermitidas: Categoria[] = ['chamada para guarda', 'queda'];
+        const categoriasPermitidas: Carta['categoria'][] = ['chamada para guarda', 'queda'];
         const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
 
         cpuCarta =
@@ -186,12 +113,15 @@ export default function ArenaPage() {
 
         // Se não há cartas jogáveis, escolhe qualquer uma (exceto finalização se não puder)
         if (cartasJogaveis.length === 0) {
-          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] || 
-                     cpuCards[Math.floor(Math.random() * cpuCards.length)];
+          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
+            cpuCards[Math.floor(Math.random() * cpuCards.length)];
         } else {
           cpuCarta = cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
         }
       }
+
+      // Atualiza o progresso baseado nas cartas jogadas
+      atualizarProgresso(cartaSelecionada, cpuCarta);
 
       setActiveCard(cartaSelecionada);
       setOpponentCard(cpuCarta);
@@ -216,7 +146,7 @@ export default function ArenaPage() {
 
       // RESTRIÇÃO DE TURNO 1 APLICADA AQUI TAMBÉM! 🎯
       if (turno === 1) {
-        const categoriasPermitidas: Categoria[] = ['chamada para guarda', 'queda'];
+        const categoriasPermitidas: Carta['categoria'][] = ['chamada para guarda', 'queda'];
         const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
 
         cpuCarta =
@@ -233,8 +163,8 @@ export default function ArenaPage() {
         });
 
         if (cartasJogaveis.length === 0) {
-          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] || 
-                     cpuCards[Math.floor(Math.random() * cpuCards.length)];
+          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
+            cpuCards[Math.floor(Math.random() * cpuCards.length)];
         } else {
           cpuCarta = cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
         }
@@ -304,10 +234,9 @@ export default function ArenaPage() {
 
       {/* Conteúdo */}
       <div className="relative z-30 flex flex-col min-h-screen justify-between p-1 sm:p-2">
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
-            <Placar startTimer={startTimer} />
-          </div>
-          
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
+          <Placar startTimer={startTimer} />
+        </div>
 
         {/* Área Central */}
         <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
@@ -373,22 +302,21 @@ export default function ArenaPage() {
           <div className="flex space-x-2 sm:space-x-4">
             {playerCards.map((card) => {
               const isFinalizacaoBloqueada = isFinalizacaoCard(card) && !canPlayFinalizacao(true);
-              
+
               return (
                 <div
                   key={card.id}
-                  className={`transition-all duration-300 flex-shrink-0 relative ${
-                    selectedCard === card.id
+                  className={`transition-all duration-300 flex-shrink-0 relative ${selectedCard === card.id
                       ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
                       : isFinalizacaoBloqueada
-                      ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
-                      : 'hover:transform hover:-translate-y-2 hover:scale-105'
-                  }`}
+                        ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
+                        : 'hover:transform hover:-translate-y-2 hover:scale-105'
+                    }`}
                 >
-                  <CardBatalha 
-                    {...card} 
-                    onCardClick={isFinalizacaoBloqueada ? undefined : handleCardClick} 
-                    mostrarInformacoes 
+                  <CardBatalha
+                    {...card}
+                    onCardClick={isFinalizacaoBloqueada ? undefined : handleCardClick}
+                    mostrarInformacoes
                   />
                   {isFinalizacaoBloqueada && (
                     <div className="absolute top-0 left-0 right-0 bg-red-600 text-white text-xs text-center py-1 rounded-t">
