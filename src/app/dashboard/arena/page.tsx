@@ -117,7 +117,7 @@ export default function ArenaPage() {
         const newProgress = prev + 10;
         return newProgress > 100 ? 100 : newProgress;
       });
-      
+
       setRightProgress(prev => {
         const newProgress = prev + 10;
         return newProgress > 100 ? 100 : newProgress;
@@ -181,7 +181,7 @@ export default function ArenaPage() {
       setForceButtonActive(true);
 
       let cpuCarta: Carta;
-      
+
       // RESTRIÇÃO DE TURNO 1 APLICADA AQUI TAMBÉM! 🎯
       if (turno === 1) {
         const categoriasPermitidas: Categoria[] = ['chamada para guarda', 'queda'];
@@ -195,7 +195,7 @@ export default function ArenaPage() {
         // Demais turnos, escolhe qualquer carta
         cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
       }
-      
+
       // Oponente joga
       setOpponentCard(cpuCarta);
       setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
@@ -233,7 +233,7 @@ export default function ArenaPage() {
       <div className="absolute left-4 top-3/7 transform -translate-y-1/2 z-20">
         <div className="flex flex-col items-center">
           <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
-            <div 
+            <div
               className="w-full bg-green-500 absolute bottom-0 transition-all duration-500 ease-out"
               style={{ height: `${leftProgress}%` }}
             ></div>
@@ -247,7 +247,7 @@ export default function ArenaPage() {
       <div className="absolute right-4 top-3/7 transform -translate-y-1/2 z-20">
         <div className="flex flex-col items-center">
           <div className="w-6 h-64 bg-gray-700 rounded-full overflow-hidden relative border-2 border-gray-600">
-            <div 
+            <div
               className="w-full bg-blue-500 absolute bottom-0 transition-all duration-500 ease-out"
               style={{ height: `${rightProgress}%` }}
             ></div>
@@ -314,7 +314,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Barra de Estamina e Botão de Força */}
-        <div className="absolute bottom-52 sm:bottom-28 right-4 z-40 flex flex-col items-center space-y-2">
+        <div className="absolute bottom-52 sm:bottom-28 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center space-y-2">
           <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden flex items-center relative">
             <div
               className="bg-green-500 h-full rounded-full transition-all duration-300"
@@ -327,11 +327,10 @@ export default function ArenaPage() {
 
           <button
             className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200
-                        ${stamina >= staminaCost
-                          ? 'bg-red-600 hover:bg-red-700 active:scale-95'
-                          : 'bg-gray-500 cursor-not-allowed'
-                        }
-                        ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}`}
+                    ${stamina >= staminaCost
+                ? 'bg-red-600 hover:bg-red-700 active:scale-95'
+                : 'bg-gray-500 cursor-not-allowed'}
+                    ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}`}
             onClick={useForceAbility}
             disabled={stamina < staminaCost}
           >
@@ -345,11 +344,10 @@ export default function ArenaPage() {
             {playerCards.map((card) => (
               <div
                 key={card.id}
-                className={`transition-all duration-300 flex-shrink-0 ${
-                  selectedCard === card.id
+                className={`transition-all duration-300 flex-shrink-0 ${selectedCard === card.id
                     ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
                     : 'hover:transform hover:-translate-y-2 hover:scale-105'
-                }`}
+                  }`}
               >
                 <CardBatalha {...card} onCardClick={handleCardClick} mostrarInformacoes />
               </div>
