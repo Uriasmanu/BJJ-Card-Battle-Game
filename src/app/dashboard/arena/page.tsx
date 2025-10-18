@@ -122,12 +122,8 @@ export default function ArenaPage() {
   const useForceAbility = useCallback(() => {
     if (stamina >= staminaCost) {
       setStamina((prev) => prev - staminaCost);
-      setForceButtonActive(true); // Ativa o estado de força
-      // Você pode adicionar a lógica do que o botão de força faz aqui.
-      // Por exemplo, dar um bônus temporário para a próxima jogada.
-      alert('Habilidade de Força ativada!');
-      // Desativa o botão de força após um curto período ou na próxima jogada
-      setTimeout(() => setForceButtonActive(false), 2000); // Exemplo: 2 segundos de duração
+      setForceButtonActive(true);
+      setTimeout(() => setForceButtonActive(false), 2000);
     } else {
       alert('Estamina insuficiente!');
     }
@@ -137,7 +133,7 @@ export default function ArenaPage() {
   useEffect(() => {
     const staminaRegenInterval = setInterval(() => {
       setStamina((prev) => Math.min(prev + 5, maxStamina)); // Regenera 5 de estamina a cada X segundos
-    }, 3000); // A cada 3 segundos
+    }, 30000); // A cada 30 segundos
 
     return () => clearInterval(staminaRegenInterval);
   }, [maxStamina]);
@@ -241,7 +237,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Barra de Estamina e Botão de Força */}
-        <div className="absolute bottom-24 sm:bottom-28 right-4 z-40 flex flex-col items-center space-y-2">
+        <div className="absolute bottom-52 sm:bottom-28 right-4 z-40 flex flex-col items-center space-y-2">
           {/* Barra de Estamina */}
           <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden flex items-center relative">
             <div
