@@ -1,9 +1,10 @@
 // lib/gameLogic/cardSetup.ts
+
 import { TECNICAS } from '@/lib/constants/techniques';
 import { obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
 
 type Dificuldade = 'facil' | 'intermediario' | 'dificil';
-type Categoria = 
+export type Categoria = 
   | 'guarda'
   | 'passagem'
   | 'finalizacao'
@@ -52,10 +53,8 @@ export const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
   gifUrl: tecnica.gif,
 });
 
-// Função principal para distribuir cartas entre jogador e CPU
-export const distribuirCartasIniciais = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
-  const cartasTodas = TECNICAS.map(montarCarta);
-  const categorias: Categoria[] = [
+// --- EXPORTAÇÕES PARA O CATÁLOGO ---
+export const CATEGORIAS_TECNICAS: Categoria[] = [
     'guarda',
     'passagem',
     'finalizacao',
@@ -64,7 +63,15 @@ export const distribuirCartasIniciais = (): { playerCards: Carta[]; cpuCards: Ca
     'defesa',
     'chamada para guarda',
     'estabilização',
-  ];
+];
+
+export const TODAS_AS_CARTAS: Carta[] = TECNICAS.map(montarCarta);
+// ------------------------------------------
+
+// Função principal para distribuir cartas entre jogador e CPU
+export const distribuirCartasIniciais = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
+  const cartasTodas = TODAS_AS_CARTAS;
+  const categorias = CATEGORIAS_TECNICAS;
 
   const player: Carta[] = [];
   const cpu: Carta[] = [];
