@@ -132,8 +132,8 @@ export default function ArenaPage() {
   // Efeito para regenerar estamina
   useEffect(() => {
     const staminaRegenInterval = setInterval(() => {
-      setStamina((prev) => Math.min(prev + 5, maxStamina)); // Regenera 5 de estamina a cada X segundos
-    }, 30000); // A cada 30 segundos
+      setStamina((prev) => Math.min(prev + 15, maxStamina)); // Regenera 5 de estamina a cada X segundos
+    }, 60000); // A cada 1 mim
 
     return () => clearInterval(staminaRegenInterval);
   }, [maxStamina]);
