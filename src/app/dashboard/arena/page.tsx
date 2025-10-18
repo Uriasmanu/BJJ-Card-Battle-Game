@@ -2,12 +2,20 @@
 
 import CardBatalha from '@/components/cardBatalha';
 import CardTecnica from '@/components/cardTecnica';
+import Placar from '@/components/placar';
 import { useState, useEffect } from 'react';
 import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
-import Placar from '@/components/placar';
 
 type Dificuldade = 'facil' | 'intermediario' | 'dificil';
-type Categoria = 'guarda' | 'passagem' | 'finalizacao' | 'raspagem' | 'queda' | 'defesa';
+type Categoria =
+  | 'guarda'
+  | 'passagem'
+  | 'finalizacao'
+  | 'raspagem'
+  | 'queda'
+  | 'defesa'
+  | 'chamada para guarda'
+  | 'estabilização';
 
 interface Carta {
   id: string;
@@ -30,6 +38,7 @@ export default function ArenaPage() {
   const [cpuCards, setCpuCards] = useState<Carta[]>([]);
   const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
   const [turno, setTurno] = useState<number>(1);
+  const [startTimer, setStartTimer] = useState(false);
 
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
@@ -54,26 +63,41 @@ export default function ArenaPage() {
     gifUrl: tecnica.gif,
   });
 
+  // Monta cartas do jogador e da CPU
   useEffect(() => {
     const cartasTodas = TECNICAS.map(montarCarta);
-    const categorias: Categoria[] = ['guarda', 'passagem', 'finalizacao', 'raspagem', 'queda', 'defesa'];
+    const categorias: Categoria[] = [
+      'guarda',
+      'passagem',
+      'finalizacao',
+      'raspagem',
+      'queda',
+      'defesa',
+      'chamada para guarda',
+      'estabilização',
+    ];
 
     const player: Carta[] = [];
     const cpu: Carta[] = [];
 
-    categorias.forEach(categoria => {
-      const cartasCategoria = cartasTodas.filter(c => c.categoria === categoria);
+    categorias.forEach((categoria) => {
+      const cartasCategoria = cartasTodas.filter((c) => c.categoria === categoria);
       const embaralhadas = embaralhar(cartasCategoria);
 
-      const cartaPlayer = embaralhadas[0];
-      const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : embaralhadas[0];
+      if (embaralhadas.length > 0) {
+        const cartaPlayer = embaralhadas[0];
+        const cartaCpu = embaralhadas.length > 1 ? embaralhadas[1] : null;
 
-      player.push(cartaPlayer);
-      cpu.push(cartaCpu);
+        player.push(cartaPlayer);
+        if (cartaCpu) cpu.push(cartaCpu);
+      }
     });
 
     setPlayerCards(player);
     setCpuCards(cpu);
+
+    // Arena pronta, iniciar timer
+    setStartTimer(true);
   }, []);
 
   const handleCardClick = (cardId: string) => {
@@ -83,31 +107,32 @@ export default function ArenaPage() {
   const handleConfirm = () => {
     if (!selectedCard) return;
 
-    const cartaSelecionada = playerCards.find(c => c.id === selectedCard);
+    const cartaSelecionada = playerCards.find((c) => c.id === selectedCard);
     if (!cartaSelecionada) return;
 
     // Escolha da CPU
     let cpuCarta: Carta;
     if (turno === 1) {
-      const opcoesCpu = cpuCards.filter(c => c.categoria === 'queda' || c.categoria === 'guarda');
-      cpuCarta = opcoesCpu.length > 0
-        ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
-        : cpuCards[Math.floor(Math.random() * cpuCards.length)];
+      const opcoesCpu = cpuCards.filter((c) => c.categoria === 'queda' || c.categoria === 'guarda');
+      cpuCarta =
+        opcoesCpu.length > 0
+          ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
+          : cpuCards[Math.floor(Math.random() * cpuCards.length)];
     } else {
       cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
     }
 
-    // Atualiza o estado da arena
+    // Atualiza arena
     setActiveCard(cartaSelecionada);
     setOpponentCard(cpuCarta);
 
-    // Remove as cartas usadas
-    setPlayerCards(prev => prev.filter(c => c.id !== selectedCard));
-    setCpuCards(prev => prev.filter(c => c.id !== cpuCarta.id));
+    // Remove cartas usadas
+    setPlayerCards((prev) => prev.filter((c) => c.id !== selectedCard));
+    setCpuCards((prev) => prev.filter((c) => c.id !== cpuCarta.id));
 
-    // Libera seleção
+    // Libera seleção e aumenta turno
     setSelectedCard(null);
-    setTurno(prev => prev + 1);
+    setTurno((prev) => prev + 1);
   };
 
   return (
@@ -139,7 +164,7 @@ export default function ArenaPage() {
         {/* Área Central */}
         <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
-            <Placar />
+            <Placar startTimer={startTimer} />
           </div>
 
           <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
@@ -147,7 +172,7 @@ export default function ArenaPage() {
               <div className="flex justify-center items-center space-x-4">
                 {opponentCard && (
                   <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes={true} />
+                    <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                   </div>
                 )}
@@ -162,7 +187,7 @@ export default function ArenaPage() {
 
                 {activeCard && (
                   <div className="transform scale-90 lg:scale-100">
-                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes={true} />
+                    <CardBatalha {...activeCard} onCardClick={undefined} mostrarInformacoes />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">VOCÊ</div>
                   </div>
                 )}
@@ -174,7 +199,7 @@ export default function ArenaPage() {
         {/* Player Hand */}
         <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
           <div className="flex space-x-2 sm:space-x-4">
-            {playerCards.map(card => (
+            {playerCards.map((card) => (
               <div
                 key={card.id}
                 className={`transition-all duration-300 flex-shrink-0 ${
@@ -183,7 +208,7 @@ export default function ArenaPage() {
                     : 'hover:transform hover:-translate-y-2 hover:scale-105'
                 }`}
               >
-                <CardBatalha {...card} onCardClick={handleCardClick} mostrarInformacoes={true} />
+                <CardBatalha {...card} onCardClick={handleCardClick} mostrarInformacoes />
               </div>
             ))}
           </div>
@@ -197,7 +222,7 @@ export default function ArenaPage() {
           >
             <div
               className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
-              onClick={e => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               <button
                 className="absolute top-3 right-3 text-white font-bold text-xl"
@@ -206,9 +231,9 @@ export default function ArenaPage() {
                 ×
               </button>
 
-              {playerCards.find(card => card.id === selectedCard) && (
+              {playerCards.find((card) => card.id === selectedCard) && (
                 <div>
-                  <CardTecnica {...playerCards.find(card => card.id === selectedCard)!} />
+                  <CardTecnica {...playerCards.find((card) => card.id === selectedCard)!} />
                   <div className="mt-4 flex justify-center space-x-4">
                     <button
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"

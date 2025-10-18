@@ -5,31 +5,10 @@ import Image from "next/image";
 import banner from '../../../public/image/inicial.png'
 import ProfileComponent from "@/components/profileComponent";
 import { useRouter } from "next/navigation";
-import { useTimer } from "@/contexts/TimerContext";
 import { useEffect } from "react";
 
 export default function DashboardPage() {
-  const { startTimer } = useTimer();
   const router = useRouter();
-
-  // Debug para verificar se a função está disponível
-  useEffect(() => {
-    console.log('🔍 DashboardPage montado, startTimer disponível:', !!startTimer);
-  }, [startTimer]);
-
-  const handleStartFight = () => {
-    console.log('🎯 Botão Iniciar Luta clicado');
-    
-    // Iniciar o timer primeiro
-    startTimer();
-    
-    console.log('🕒 Timer iniciado, navegando para arena...');
-    
-    // Navegar para a arena após um pequeno delay
-    setTimeout(() => {
-      router.push("/dashboard/arena");
-    }, 100);
-  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col lg:flex-row">
@@ -51,7 +30,7 @@ export default function DashboardPage() {
 
           <div className="max-w-md mx-auto space-y-6">
             <button 
-              onClick={handleStartFight} 
+              onClick={() => router.push("/dashboard/arena")}
               className="w-full py-4 px-6 text-lg font-bold rounded-lg text-gray-900 border-2 border-amber-300 flex items-center justify-center gap-3 bg-amber-300 hover:bg-amber-400 transition-all duration-300"
             >
               <HandFist className="w-6 h-6" />
