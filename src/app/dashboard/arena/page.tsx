@@ -303,28 +303,14 @@ export default function ArenaPage() {
       </div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 flex flex-col min-h-screen justify-between p-1 sm:p-2">
-        {/* Opponent Hand */}
-        <div className="opponent-hand flex justify-center mt-1 sm:mt-2 relative z-20 overflow-x-auto">
-          <div className="flex space-x-[-8px] sm:space-x-[-12px] px-1">
-            {cpuCards.map((_, index) => (
-              <div
-                key={index}
-                className="w-10 h-14 sm:w-12 sm:h-16 bg-slate-900 shadow-lg rounded-md cursor-default opacity-90 flex-shrink-0"
-                style={{ transform: `rotateZ(${-8 + index * 4}deg)` }}
-              >
-                <div className="card-back absolute w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-md border border-gray-700"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Área Central */}
-        <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
+      <div className="relative z-30 flex flex-col min-h-screen justify-between p-1 sm:p-2">
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
             <Placar startTimer={startTimer} />
           </div>
+          
 
+        {/* Área Central */}
+        <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
           <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
             <div className="rounded-xl p-4 sm:p-6 border border-white/10">
               <div className="flex justify-center items-center space-x-4">
