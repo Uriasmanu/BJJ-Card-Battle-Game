@@ -344,7 +344,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Barra de Estamina e Botão de Força */}
-        <div className="absolute bottom-52 sm:bottom-28 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center space-y-2">
+        <div className="absolute bottom-52 sm:bottom-28 lg:bottom-56 left-1/2 transform -translate-x-1/2 z-40 flex flex-col items-center space-y-2">
           <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden flex items-center relative">
             <div
               className="bg-green-500 h-full rounded-full transition-all duration-300"
