@@ -43,6 +43,9 @@ export default function ArenaPage() {
   const [leftProgress, setLeftProgress] = useState(0);
   const [rightProgress, setRightProgress] = useState(0);
 
+  // ✅ CORREÇÃO: Move the hook to top level
+  const forceAbility = useForceAbilityLogic();
+
   const canPlayFinalizacao = useCallback(
     (isPlayer: boolean) => canPlayFinalizacaoLogic(isPlayer, leftProgress, rightProgress),
     [leftProgress, rightProgress]
@@ -58,6 +61,7 @@ export default function ArenaPage() {
     setStartTimer(true);
   }, []);
 
+  // ✅ CORREÇÃO: Fixed handleCardClick (remove unused variable warning)
   const handleCardClick = (cardId: string) => {
     if (!selectedCard) {
       const cartaClicada = playerCards.find(card => card.id === cardId);
@@ -117,8 +121,12 @@ export default function ArenaPage() {
     [selectedCard, playerCards, cpuCards, turno, leftProgress, rightProgress]
   );
 
+  // ✅ CORREÇÃO: Properly use the force ability logic
   const useForceAbility = useCallback(() => {
-    useForceAbilityLogic({
+    if (stamina < staminaCost) return;
+
+    // Use the forceAbility object returned by the hook
+    forceAbility.execute({
       stamina,
       staminaCost,
       cpuCards,
@@ -137,12 +145,7 @@ export default function ArenaPage() {
     cpuCards,
     turno,
     rightProgress,
-    setStamina,
-    setForceButtonActive,
-    setOpponentCard,
-    setCpuCards,
-    setActiveCard,
-    setTurno,
+    forceAbility, // Add forceAbility to dependencies
   ]);
 
   // Regeneração de estamina
