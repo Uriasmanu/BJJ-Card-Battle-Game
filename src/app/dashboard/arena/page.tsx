@@ -52,6 +52,15 @@ export default function ArenaPage() {
   const [leftProgress, setLeftProgress] = useState(0);
   const [rightProgress, setRightProgress] = useState(0);
 
+  // Funções auxiliares para verificar finalização
+  const canPlayFinalizacao = (isPlayer: boolean) => {
+    return isPlayer ? leftProgress === 100 : rightProgress === 100;
+  };
+
+  const isFinalizacaoCard = (carta: Carta) => {
+    return carta.categoria === 'finalizacao';
+  };
+
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
     for (let i = novoArray.length - 1; i > 0; i--) {
@@ -128,7 +137,17 @@ export default function ArenaPage() {
   }, []);
 
   const handleCardClick = (cardId: string) => {
-    if (!selectedCard) setSelectedCard(cardId);
+    if (!selectedCard) {
+      const cartaClicada = playerCards.find(card => card.id === cardId);
+      if (cartaClicada) {
+        // Verifica se é uma carta de finalização e se pode jogar
+        if (isFinalizacaoCard(cartaClicada) && !canPlayFinalizacao(true)) {
+          alert('Você só pode jogar cartas de finalização quando sua barra de progresso estiver em 100%!');
+          return;
+        }
+        setSelectedCard(cardId);
+      }
+    }
   };
 
   const handleOpponentCardClick = () => {
@@ -157,8 +176,21 @@ export default function ArenaPage() {
             ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
             : cpuCards[Math.floor(Math.random() * cpuCards.length)];
       } else {
-        // Demais turnos, escolhe qualquer carta
-        cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+        // Demais turnos - filtra cartas que podem ser jogadas
+        const cartasJogaveis = cpuCards.filter(carta => {
+          if (isFinalizacaoCard(carta) && !canPlayFinalizacao(false)) {
+            return false; // CPU não pode jogar finalização se progresso não estiver em 100%
+          }
+          return true;
+        });
+
+        // Se não há cartas jogáveis, escolhe qualquer uma (exceto finalização se não puder)
+        if (cartasJogaveis.length === 0) {
+          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] || 
+                     cpuCards[Math.floor(Math.random() * cpuCards.length)];
+        } else {
+          cpuCarta = cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
+        }
       }
 
       setActiveCard(cartaSelecionada);
@@ -171,7 +203,7 @@ export default function ArenaPage() {
       setTurno((prev) => prev + 1);
       setForceButtonActive(false);
     },
-    [selectedCard, playerCards, cpuCards, turno]
+    [selectedCard, playerCards, cpuCards, turno, leftProgress, rightProgress]
   );
 
   // Botão de força (PULA A VEZ DO JOGADOR - JOGADA DA CPU AUTOMÁTICA)
@@ -192,8 +224,20 @@ export default function ArenaPage() {
             ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
             : cpuCards[Math.floor(Math.random() * cpuCards.length)];
       } else {
-        // Demais turnos, escolhe qualquer carta
-        cpuCarta = cpuCards[Math.floor(Math.random() * cpuCards.length)];
+        // Filtra cartas que podem ser jogadas (incluindo verificação de finalização)
+        const cartasJogaveis = cpuCards.filter(carta => {
+          if (isFinalizacaoCard(carta) && !canPlayFinalizacao(false)) {
+            return false;
+          }
+          return true;
+        });
+
+        if (cartasJogaveis.length === 0) {
+          cpuCarta = cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] || 
+                     cpuCards[Math.floor(Math.random() * cpuCards.length)];
+        } else {
+          cpuCarta = cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
+        }
       }
 
       // Oponente joga
@@ -209,7 +253,7 @@ export default function ArenaPage() {
     } else if (stamina < staminaCost) {
       alert('Estamina insuficiente!');
     }
-  }, [stamina, staminaCost, cpuCards, turno]);
+  }, [stamina, staminaCost, cpuCards, turno, rightProgress]);
 
   // Regeneração de estamina
   useEffect(() => {
@@ -341,17 +385,33 @@ export default function ArenaPage() {
         {/* Player Hand */}
         <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
           <div className="flex space-x-2 sm:space-x-4">
-            {playerCards.map((card) => (
-              <div
-                key={card.id}
-                className={`transition-all duration-300 flex-shrink-0 ${selectedCard === card.id
-                    ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
-                    : 'hover:transform hover:-translate-y-2 hover:scale-105'
+            {playerCards.map((card) => {
+              const isFinalizacaoBloqueada = isFinalizacaoCard(card) && !canPlayFinalizacao(true);
+              
+              return (
+                <div
+                  key={card.id}
+                  className={`transition-all duration-300 flex-shrink-0 relative ${
+                    selectedCard === card.id
+                      ? 'transform -translate-y-4 sm:-translate-y-4 scale-110 z-30'
+                      : isFinalizacaoBloqueada
+                      ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
+                      : 'hover:transform hover:-translate-y-2 hover:scale-105'
                   }`}
-              >
-                <CardBatalha {...card} onCardClick={handleCardClick} mostrarInformacoes />
-              </div>
-            ))}
+                >
+                  <CardBatalha 
+                    {...card} 
+                    onCardClick={isFinalizacaoBloqueada ? undefined : handleCardClick} 
+                    mostrarInformacoes 
+                  />
+                  {isFinalizacaoBloqueada && (
+                    <div className="absolute top-0 left-0 right-0 bg-red-600 text-white text-xs text-center py-1 rounded-t">
+                      Aguarde 100%
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
