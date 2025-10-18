@@ -3,8 +3,9 @@
 import CardBatalha from '@/components/cardBatalha';
 import CardTecnica from '@/components/cardTecnica';
 import Placar from '@/components/placar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TECNICAS, obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
+import { HandFist, Zap } from 'lucide-react';
 
 type Dificuldade = 'facil' | 'intermediario' | 'dificil';
 type Categoria =
@@ -39,6 +40,13 @@ export default function ArenaPage() {
   const [opponentCard, setOpponentCard] = useState<Carta | null>(null);
   const [turno, setTurno] = useState<number>(1);
   const [startTimer, setStartTimer] = useState(false);
+  const [showOpponentModal, setShowOpponentModal] = useState(false);
+
+  // Novos estados para Força e Estamina
+  const [stamina, setStamina] = useState(100); // Começa com 100 de estamina
+  const [maxStamina] = useState(100); // Estamina máxima
+  const [forceButtonActive, setForceButtonActive] = useState(false); // Estado para o botão de força
+  const staminaCost = 30; // Custo de estamina para o botão de força
 
   const embaralhar = (array: Carta[]) => {
     const novoArray = [...array];
@@ -104,6 +112,36 @@ export default function ArenaPage() {
     if (!selectedCard) setSelectedCard(cardId);
   };
 
+  const handleOpponentCardClick = () => {
+    if (opponentCard) {
+      setShowOpponentModal(true);
+    }
+  };
+
+  // Função para usar o botão de força
+  const useForceAbility = useCallback(() => {
+    if (stamina >= staminaCost) {
+      setStamina((prev) => prev - staminaCost);
+      setForceButtonActive(true); // Ativa o estado de força
+      // Você pode adicionar a lógica do que o botão de força faz aqui.
+      // Por exemplo, dar um bônus temporário para a próxima jogada.
+      alert('Habilidade de Força ativada!');
+      // Desativa o botão de força após um curto período ou na próxima jogada
+      setTimeout(() => setForceButtonActive(false), 2000); // Exemplo: 2 segundos de duração
+    } else {
+      alert('Estamina insuficiente!');
+    }
+  }, [stamina, staminaCost]);
+
+  // Efeito para regenerar estamina
+  useEffect(() => {
+    const staminaRegenInterval = setInterval(() => {
+      setStamina((prev) => Math.min(prev + 5, maxStamina)); // Regenera 5 de estamina a cada X segundos
+    }, 3000); // A cada 3 segundos
+
+    return () => clearInterval(staminaRegenInterval);
+  }, [maxStamina]);
+
   const handleConfirm = () => {
     if (!selectedCard) return;
 
@@ -133,6 +171,9 @@ export default function ArenaPage() {
     // Libera seleção e aumenta turno
     setSelectedCard(null);
     setTurno((prev) => prev + 1);
+
+    // Resetar estado de força se for uma habilidade por turno
+    setForceButtonActive(false);
   };
 
   return (
@@ -171,7 +212,10 @@ export default function ArenaPage() {
             <div className="rounded-xl p-4 sm:p-6 border border-white/10">
               <div className="flex justify-center items-center space-x-4">
                 {opponentCard && (
-                  <div className="transform scale-90 lg:scale-100">
+                  <div
+                    className="transform scale-90 lg:scale-100 cursor-pointer"
+                    onClick={handleOpponentCardClick}
+                  >
                     <CardBatalha {...opponentCard} onCardClick={undefined} mostrarInformacoes />
                     <div className="text-white text-sm lg:text-base font-semibold mt-1">OPONENTE</div>
                   </div>
@@ -195,6 +239,36 @@ export default function ArenaPage() {
             </div>
           </div>
         </div>
+
+        {/* Barra de Estamina e Botão de Força */}
+        <div className="absolute bottom-24 sm:bottom-28 right-4 z-40 flex flex-col items-center space-y-2">
+          {/* Barra de Estamina */}
+          <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden flex items-center relative">
+            <div
+              className="bg-green-500 h-full rounded-full transition-all duration-300"
+              style={{ width: `${(stamina / maxStamina) * 100}%` }}
+            ></div>
+            <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">
+              <Zap className="mr-1 h-3 w-3 text-yellow-300" /> {stamina}/{maxStamina}
+            </div>
+          </div>
+
+          {/* Botão de Força */}
+          <button
+            className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200
+                        ${stamina >= staminaCost
+                          ? 'bg-red-600 hover:bg-red-700 active:scale-95'
+                          : 'bg-gray-500 cursor-not-allowed'
+                        }
+                        ${forceButtonActive ? 'ring-4 ring-yellow-400' : ''}
+                      `}
+            onClick={useForceAbility}
+            disabled={stamina < staminaCost}
+          >
+            <HandFist className="text-white text-2xl" />
+          </button>
+        </div>
+
 
         {/* Player Hand */}
         <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
@@ -250,6 +324,38 @@ export default function ArenaPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Modal da carta do oponente */}
+        {showOpponentModal && opponentCard && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setShowOpponentModal(false)}
+          >
+            <div
+              className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="absolute top-3 right-3 text-white font-bold text-xl"
+                onClick={() => setShowOpponentModal(false)}
+              >
+                ×
+              </button>
+
+              <div>
+                <CardTecnica {...opponentCard} />
+                <div className="mt-4 flex justify-center">
+                  <button
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold"
+                    onClick={() => setShowOpponentModal(false)}
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

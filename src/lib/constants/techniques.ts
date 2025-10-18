@@ -477,19 +477,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // OMOPLATA
-  {
-    id: 'omoplata',
-    nome: 'Omoplata',
-    categoria: 'finalizacao',
-    dificuldade: 'intermediario',
-    descricao: 'Chave de ombro aplicada da guarda, usando as pernas para girar o oponente.',
-    faixa: '(Todas)',
-    defesas: ['defesa-omoplata'],
-    proximosMovimentos: ['estrangulamento-reto-guarda'],
-    ...getAssetPaths(''),
-  },
-
   // EZEQUIEL CHOKE
   {
     id: 'ezequiel-choke',
