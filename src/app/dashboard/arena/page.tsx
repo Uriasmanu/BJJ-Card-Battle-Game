@@ -172,26 +172,22 @@ export default function ArenaPage() {
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 w-full">
-            {CATEGORIAS_TECNICAS.map((category) => {
-              const quantidade = TODAS_AS_CARTAS.filter(
-                carta => carta.categoria.toLowerCase() === category.toLowerCase()
-              ).length;
-              return (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className="bg-gray-700 hover:bg-yellow-600 text-white p-3 rounded-lg text-center capitalize transition-all duration-200 transform hover:scale-105 flex flex-col items-center justify-center min-h-[80px]"
-                >
-                  <span className="font-semibold text-sm">{category}</span>
-                </button>
-              );
-            })}
+            {CATEGORIAS_TECNICAS.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className="bg-gray-700 hover:bg-yellow-600 text-white p-3 rounded-lg text-center capitalize transition-all duration-200 transform hover:scale-105 flex flex-col items-center justify-center min-h-[80px]"
+              >
+                <span className="font-semibold text-sm">{category}</span>
+              </button>
+            ))}
           </div>
+
         </div>
       );
     }
 
-    
+
     // 2. Visão do Carrossel de Cartas de uma Categoria
     const cartasDaCategoria = playerCards.filter(
       (carta) => carta.categoria.toLowerCase() === selectedCategory.toLowerCase()
@@ -228,16 +224,14 @@ export default function ArenaPage() {
           <div className="flex space-x-4 pb-4 min-w-max px-2">
             {cartasDaCategoria.map((carta) => {
               const isFinalizacaoBloqueada = isFinalizacaoCard(carta) && !canPlayFinalizacao(true);
-              const naMao = playerCards.some(card => card.id === carta.id);
 
               return (
                 <div
                   key={carta.id}
-                  className={`transition-all duration-300 flex-shrink-0 relative ${
-                    isFinalizacaoBloqueada
-                      ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
-                      : 'hover:transform hover:-translate-y-2 hover:scale-105 cursor-pointer'
-                  } ${naMao ? 'ring-2 ring-green-500 rounded-lg' : ''}`}
+                  className={`transition-all duration-300 flex-shrink-0 relative ${isFinalizacaoBloqueada
+                    ? 'opacity-60 filter grayscale-70 cursor-not-allowed'
+                    : 'hover:transform hover:-translate-y-2 hover:scale-105 cursor-pointer'
+                    }`}
                   onClick={isFinalizacaoBloqueada ? undefined : () => handleCatalogCardClick(carta)}
                 >
                   <CardBatalha
@@ -250,17 +244,13 @@ export default function ArenaPage() {
                       Aguarde 100%
                     </div>
                   )}
-                  {naMao && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-green-600 text-white text-xs text-center py-1 rounded-b">
-                      Na sua mão
-                    </div>
-                  )}
                 </div>
               );
             })}
           </div>
-        </div>
-      </div>
+
+        </div >
+      </div >
     );
   };
 

@@ -73,35 +73,37 @@ export const TODAS_AS_CARTAS: Carta[] = TECNICAS.map(montarCarta);
 export const distribuirCartasIniciais = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
   const cartasPorCategoria: Record<Categoria, Carta[]> = {} as Record<Categoria, Carta[]>;
 
-  // Agrupa por categoria
+  // Agrupa as cartas por categoria
   CATEGORIAS_TECNICAS.forEach((categoria) => {
-    cartasPorCategoria[categoria] = TODAS_AS_CARTAS.filter(
-      (carta) => carta.categoria.toLowerCase() === categoria.toLowerCase()
+    cartasPorCategoria[categoria] = embaralhar(
+      TODAS_AS_CARTAS.filter(
+        (carta) => carta.categoria.toLowerCase() === categoria.toLowerCase()
+      )
     );
   });
 
   const player: Carta[] = [];
   const cpu: Carta[] = [];
 
-  // Seleciona 2 cartas por categoria (1 para player e 1 para CPU)
+  // Para cada categoria, seleciona até 2 cartas diferentes
   CATEGORIAS_TECNICAS.forEach((categoria) => {
-    const cartas = embaralhar(cartasPorCategoria[categoria]);
+    const cartas = cartasPorCategoria[categoria];
 
-    // Garante que não estoure caso tenha poucas cartas
-    const cartaPlayer = cartas[0];
-    const cartaCPU = cartas[1] ?? cartas[0];
+    if (cartas.length > 0) {
+      // Player recebe até 2 cartas diferentes
+      const cartasPlayer = cartas.slice(0, 2);
+      player.push(...cartasPlayer);
 
-    if (cartaPlayer) player.push(cartaPlayer);
-    if (cartaCPU) cpu.push(cartaCPU);
+      // CPU também recebe até 2 (pode coincidir com player, mas não duplicar dentro do próprio baralho)
+      const cartasCPU = cartas.slice(0, 2);
+      cpu.push(...cartasCPU);
+    }
   });
 
-  // Duplica para garantir 2 de cada categoria (16 cartas totais)
-  const playerCards = embaralhar([...player, ...player]).slice(0, 16);
-  const cpuCards = embaralhar([...cpu, ...cpu]).slice(0, 16);
-
-  // Cada jogador começa com 8 cartas (2 de cada categoria)
+  // Embaralha o resultado final
   return {
-    playerCards: embaralhar(playerCards).slice(0, 16),
-    cpuCards: embaralhar(cpuCards).slice(0, 16),
+    playerCards: embaralhar(player),
+    cpuCards: embaralhar(cpu),
   };
 };
+
