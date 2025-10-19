@@ -118,7 +118,7 @@ export default function ArenaPage() {
   );
 
   const useForceAbility = useCallback(() => {
-    useForceAbilityLogic({
+    forceAbilityLogic({
       stamina,
       staminaCost,
       cpuCards,
