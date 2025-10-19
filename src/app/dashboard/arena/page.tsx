@@ -183,7 +183,6 @@ export default function ArenaPage() {
                   className="bg-gray-700 hover:bg-yellow-600 text-white p-3 rounded-lg text-center capitalize transition-all duration-200 transform hover:scale-105 flex flex-col items-center justify-center min-h-[80px]"
                 >
                   <span className="font-semibold text-sm">{category}</span>
-                  <span className="text-xs text-gray-300 mt-1">{quantidade} técnicas</span>
                 </button>
               );
             })}
@@ -192,8 +191,9 @@ export default function ArenaPage() {
       );
     }
 
+    
     // 2. Visão do Carrossel de Cartas de uma Categoria
-    const cartasDaCategoria = TODAS_AS_CARTAS.filter(
+    const cartasDaCategoria = playerCards.filter(
       (carta) => carta.categoria.toLowerCase() === selectedCategory.toLowerCase()
     );
 

@@ -1,5 +1,3 @@
-// lib/gameLogic/cardSetup.ts
-
 import { TECNICAS } from '@/lib/constants/techniques';
 import { obterCorCategoria, obterCorDificuldade } from '@/lib/constants/techniques';
 
@@ -38,7 +36,7 @@ export const embaralhar = <T>(array: T[]): T[] => {
   return novoArray;
 };
 
-// Função para montar uma carta a partir da técnica
+// Monta uma carta a partir da técnica
 export const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
   id: tecnica.id,
   titulo: tecnica.nome,
@@ -53,68 +51,57 @@ export const montarCarta = (tecnica: typeof TECNICAS[number]): Carta => ({
   gifUrl: tecnica.gif,
 });
 
-// --- EXPORTAÇÕES PARA O CATÁLOGO ---
+// Categorias disponíveis
 export const CATEGORIAS_TECNICAS: Categoria[] = [
-    'guarda',
-    'passagem',
-    'finalizacao',
-    'raspagem',
-    'queda',
-    'defesa',
-    'chamada para guarda',
-    'estabilização',
+  'guarda',
+  'passagem',
+  'finalizacao',
+  'raspagem',
+  'queda',
+  'defesa',
+  'chamada para guarda',
+  'estabilização',
 ];
 
+// Todas as cartas
 export const TODAS_AS_CARTAS: Carta[] = TECNICAS.map(montarCarta);
-// ------------------------------------------
 
-// lib/gameLogic/cardSetup.ts
-
-// ... imports e interfaces existentes
-
-// Nova função para distribuir cartas sem limitação por categoria
+/**
+ * Distribui 2 cartas de cada categoria para o jogador e CPU.
+ * Total: 16 cartas (8 categorias × 2 cartas cada)
+ */
 export const distribuirCartasIniciais = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
-  const cartasTodas = TODAS_AS_CARTAS;
-  
-  // Embaralha todas as cartas
-  const cartasEmbaralhadas = embaralhar([...cartasTodas]);
-  
-  // Distribui 8 cartas para cada jogador (ou ajuste conforme necessário)
-  const player = cartasEmbaralhadas.slice(0, 8);
-  const cpu = cartasEmbaralhadas.slice(8, 16);
-  
-  return { playerCards: player, cpuCards: cpu };
-};
-
-// Função alternativa se quiser manter alguma variedade de categorias
-export const distribuirCartasBalanceadas = (): { playerCards: Carta[]; cpuCards: Carta[] } => {
   const cartasPorCategoria: Record<Categoria, Carta[]> = {} as Record<Categoria, Carta[]>;
-  
-  // Agrupa cartas por categoria
-  CATEGORIAS_TECNICAS.forEach(categoria => {
-    cartasPorCategoria[categoria] = TODAS_AS_CARTAS.filter(c => c.categoria === categoria);
+
+  // Agrupa por categoria
+  CATEGORIAS_TECNICAS.forEach((categoria) => {
+    cartasPorCategoria[categoria] = TODAS_AS_CARTAS.filter(
+      (carta) => carta.categoria.toLowerCase() === categoria.toLowerCase()
+    );
   });
-  
+
   const player: Carta[] = [];
   const cpu: Carta[] = [];
-  
-  // Para cada categoria, pega 1-2 cartas aleatórias para cada jogador
-  CATEGORIAS_TECNICAS.forEach(categoria => {
-    const cartasCategoria = [...cartasPorCategoria[categoria]];
-    const embaralhadas = embaralhar(cartasCategoria);
-    
-    // Adiciona até 2 cartas para o jogador desta categoria
-    const cartasPlayer = embaralhadas.slice(0, 2);
-    player.push(...cartasPlayer);
-    
-    // Adiciona até 2 cartas para a CPU desta categoria
-    const cartasCPU = embaralhadas.slice(2, 4);
-    cpu.push(...cartasCPU);
+
+  // Seleciona 2 cartas por categoria (1 para player e 1 para CPU)
+  CATEGORIAS_TECNICAS.forEach((categoria) => {
+    const cartas = embaralhar(cartasPorCategoria[categoria]);
+
+    // Garante que não estoure caso tenha poucas cartas
+    const cartaPlayer = cartas[0];
+    const cartaCPU = cartas[1] ?? cartas[0];
+
+    if (cartaPlayer) player.push(cartaPlayer);
+    if (cartaCPU) cpu.push(cartaCPU);
   });
-  
-  // Embaralha as mãos finais para misturar as categorias
+
+  // Duplica para garantir 2 de cada categoria (16 cartas totais)
+  const playerCards = embaralhar([...player, ...player]).slice(0, 16);
+  const cpuCards = embaralhar([...cpu, ...cpu]).slice(0, 16);
+
+  // Cada jogador começa com 8 cartas (2 de cada categoria)
   return {
-    playerCards: embaralhar(player).slice(0, 8),
-    cpuCards: embaralhar(cpu).slice(0, 8)
+    playerCards: embaralhar(playerCards).slice(0, 16),
+    cpuCards: embaralhar(cpuCards).slice(0, 16),
   };
 };
