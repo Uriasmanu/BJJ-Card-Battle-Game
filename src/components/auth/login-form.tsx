@@ -34,7 +34,7 @@ export default function LoginForm() {
           </svg>
           <input
             type="email"
-            placeholder="Enter your Email"
+            placeholder="Email"
             className="ml-3 w-full h-full border-none outline-none rounded-lg placeholder:text-gray-400 text-sm"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -43,7 +43,7 @@ export default function LoginForm() {
       </div>
 
       <div className="flex flex-col">
-        <label className="text-[#151717] font-semibold text-sm sm:text-base">Password</label>
+        <label className="text-[#151717] font-semibold text-sm sm:text-base">Senha</label>
         <div className="flex items-center h-10 sm:h-12 border border-gray-200 rounded-lg pl-2 focus-within:border-blue-500 transition">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@ export default function LoginForm() {
           </svg>
           <input
             type="password"
-            placeholder="Enter your Password"
+            placeholder="Senha"
             className="ml-3 w-full h-full border-none outline-none rounded-lg placeholder:text-gray-400 text-sm"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -65,31 +65,14 @@ export default function LoginForm() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs sm:text-sm mt-2">
-        <label className="flex items-center gap-1 text-gray-700">
-          <input type="checkbox" className="accent-blue-600 w-3 h-3 sm:w-4 sm:h-4" />
-          Remember me
-        </label>
-        <span className="text-blue-600 font-medium cursor-pointer">
-          Forgot password?
-        </span>
-      </div>
-
       <button
         type="submit"
         className="mt-4 bg-[#151717] text-white text-sm sm:text-[15px] font-medium rounded-lg h-10 sm:h-12 w-full hover:bg-black transition"
       >
-        Sign In
+        Entrar
       </button>
 
-      <p className="text-center text-xs sm:text-sm text-black mt-2">
-        Don&apos;t have an account?{' '}
-        <span className="text-blue-600 font-medium cursor-pointer">
-          Sign Up
-        </span>
-      </p>
-
-      <p className="text-center text-xs sm:text-sm text-black my-2">Or With</p>
+      <p className="text-center text-xs sm:text-sm text-black my-2">Ou</p>
 
       <div className="flex flex-col gap-2 sm:gap-3">
         <button

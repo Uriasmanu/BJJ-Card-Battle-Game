@@ -27,11 +27,6 @@ const items = [
     url: "/dashboard/tecnicas",
     icon: Layers, 
   },
-  {
-    title: "Configurações",
-    url: "/settings",
-    icon: Settings,
-  },
 ]
 
 export function AppSidebar() {
