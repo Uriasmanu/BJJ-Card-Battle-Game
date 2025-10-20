@@ -550,20 +550,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // EZEQUIEL CHOKE
-  {
-    id: 'ezequiel-choke',
-    nome: 'Ezequiel Choke',
-    categoria: 'finalizacao',
-    dificuldade: 'intermediario',
-    descricao: 'Estrangulamento aplicado de dentro da guarda ou da montada usando a própria manga e antebraço.',
-    faixa: '(Todas)',
-    vantagens: [],
-    defesas: ['defesa-ezequiel'],
-    proximosMovimentos: ['montada', 'lateral'],
-    ...getAssetPaths(''),
-  },
-
   // ESTRANGULAMENTO COM GOLA (Lapel Choke)
   {
     id: 'estrangulamento-com-gola',
@@ -578,19 +564,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // GUILHOTINA
-  {
-    id: 'guillotine',
-    nome: 'Guilhotina',
-    categoria: 'finalizacao',
-    dificuldade: 'intermediario',
-    descricao: 'Estrangulamento frontal com o braço em torno do pescoço, usado ao defender quedas.',
-    faixa: '(Todas)',
-    vantagens: [],
-    defesas: ['defesa-guillotine'],
-    proximosMovimentos: ['montada', 'lateral'],
-    ...getAssetPaths(''),
-  },
 
   // CROSS COLLAR CHOKE
   {
@@ -877,18 +850,7 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['montada'],
     ...getAssetPaths('jacare-banguela'),
   },
-  {
-    id: 'defesa-single-leg',
-    nome: 'Defesa Single Leg',
-    categoria: 'defesa',
-    dificuldade: 'facil',
-    descricao: 'Defesa contra entrada de single leg',
-    faixa: '(Todas)',
-    vantagens: [],
-    defesas: [],
-    proximosMovimentos: ['passagem-de-guarda'],
-    ...getAssetPaths('defesa-single-leg'),
-  },
+  
 ];
 
 // Funções auxiliares
