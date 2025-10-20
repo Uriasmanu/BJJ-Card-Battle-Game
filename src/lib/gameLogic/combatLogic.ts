@@ -9,6 +9,8 @@ export interface TurnoResultado {
   cpuCard: Carta;
   novoLeftProgress: number;
   novoRightProgress: number;
+  pontosPlayer: number;
+  pontosCpu: number;
 }
 
 /**
@@ -35,16 +37,15 @@ const canPlayFinalizacao = (isPlayer: boolean, leftProgress: number, rightProgre
  * @returns O valor roubado e o novo valor da barra de origem.
  */
 const calcularRoubo = (barraOrigem: number): { valorRoubado: number, novoBarraOrigem: number } => {
-    // Rouba até 20% da barra de origem
-    const maxRoubo = 20;
-    const valorRoubado = Math.min(barraOrigem, maxRoubo);
-    
-    // Novo valor da barra de origem (mínimo 0)
-    const novoBarraOrigem = Math.max(0, barraOrigem - valorRoubado);
-    
-    return { valorRoubado, novoBarraOrigem };
-};
+  // Rouba até 20% da barra de origem
+  const maxRoubo = 20;
+  const valorRoubado = Math.min(barraOrigem, maxRoubo);
 
+  // Novo valor da barra de origem (mínimo 0)
+  const novoBarraOrigem = Math.max(0, barraOrigem - valorRoubado);
+
+  return { valorRoubado, novoBarraOrigem };
+};
 
 /**
  * Atualiza o progresso baseado na comparação das cartas, incluindo a lógica de finalização.
@@ -59,10 +60,17 @@ const atualizarProgresso = (
   cpuCard: Carta,
   currentLeftProgress: number,
   currentRightProgress: number
-): { novoLeftProgress: number, novoRightProgress: number } => {
-  
+): { 
+  novoLeftProgress: number, 
+  novoRightProgress: number,
+  pontosPlayer: number,
+  pontosCpu: number 
+} => {
+
   let novoLeftProgress = currentLeftProgress;
   let novoRightProgress = currentRightProgress;
+  let pontosPlayer = 0;
+  let pontosCpu = 0;
 
   const playerIsFinalizando = isFinalizacaoCard(playerCard);
   const cpuIsFinalizando = isFinalizacaoCard(cpuCard);
@@ -73,20 +81,22 @@ const atualizarProgresso = (
 
   // Prioridade 1: Jogador finaliza
   if (playerIsFinalizando && playerPodeFinalizar) {
-      // Jogador finaliza, rouba da CPU
-      const { valorRoubado, novoBarraOrigem } = calcularRoubo(currentRightProgress);
-      novoRightProgress = novoBarraOrigem; // CPU perde
-      novoLeftProgress = Math.min(currentLeftProgress + valorRoubado, 100); // Jogador ganha
-      return { novoLeftProgress, novoRightProgress };
+    // Jogador finaliza, rouba da CPU
+    const { valorRoubado, novoBarraOrigem } = calcularRoubo(currentRightProgress);
+    novoRightProgress = novoBarraOrigem; // CPU perde
+    novoLeftProgress = Math.min(currentLeftProgress + valorRoubado, 100); // Jogador ganha
+    pontosPlayer = playerCard.pontos || 0; // Jogador ganha pontos da sua carta
+    return { novoLeftProgress, novoRightProgress, pontosPlayer, pontosCpu };
   }
 
   // Prioridade 2: CPU finaliza
   if (cpuIsFinalizando && cpuPodeFinalizar) {
-      // CPU finaliza, rouba do Jogador
-      const { valorRoubado, novoBarraOrigem } = calcularRoubo(currentLeftProgress);
-      novoLeftProgress = novoBarraOrigem; // Jogador perde
-      novoRightProgress = Math.min(currentRightProgress + valorRoubado, 100); // CPU ganha
-      return { novoLeftProgress, novoRightProgress };
+    // CPU finaliza, rouba do Jogador
+    const { valorRoubado, novoBarraOrigem } = calcularRoubo(currentLeftProgress);
+    novoLeftProgress = novoBarraOrigem; // Jogador perde
+    novoRightProgress = Math.min(currentRightProgress + valorRoubado, 100); // CPU ganha
+    pontosCpu = cpuCard.pontos || 0; // CPU ganha pontos da sua carta
+    return { novoLeftProgress, novoRightProgress, pontosPlayer, pontosCpu };
   }
 
   // 2. LÓGICA DE EMPATE ESPECIAL (Ambos perdem 5% de dominação)
@@ -95,35 +105,43 @@ const atualizarProgresso = (
   // o efeito de roubo da CPU, resultando num empate.
   // Por simplicidade, aplicamos a regra de empate se ambos jogaram finalização e nenhuma das regras de roubo acima se aplicou.
   if (playerIsFinalizando && cpuIsFinalizando) {
-       // Empate especial (Ambos perdem 5% de dominação - de acordo com a regra no prompt)
-       novoLeftProgress = Math.max(0, currentLeftProgress - 5);
-       novoRightProgress = Math.max(0, currentRightProgress - 5);
-       return { novoLeftProgress, novoRightProgress };
+    // Empate especial (Ambos perdem 5% de dominação - de acordo com a regra no prompt)
+    novoLeftProgress = Math.max(0, currentLeftProgress - 5);
+    novoRightProgress = Math.max(0, currentRightProgress - 5);
+    // Empate: nenhum ponto para ninguém
+    return { novoLeftProgress, novoRightProgress, pontosPlayer, pontosCpu };
   }
-  
+
   // 3. LÓGICA PADRÃO (Vantagem / Empate de 5%)
   // Busca a técnica original para ter acesso às vantagens
   const playerTecnica = TECNICAS.find(t => t.id === playerCard.id);
   const cpuTecnica = TECNICAS.find(t => t.id === cpuCard.id);
 
   if (!playerTecnica || !cpuTecnica) {
-    return { novoLeftProgress: currentLeftProgress, novoRightProgress: currentRightProgress };
+    return { 
+      novoLeftProgress: currentLeftProgress, 
+      novoRightProgress: currentRightProgress, 
+      pontosPlayer: 0, 
+      pontosCpu: 0 
+    };
   }
-  
+
   if (playerTecnica.vantagens.includes(cpuTecnica.id)) {
     // Jogador tem vantagem -> aumenta progresso do jogador
     novoLeftProgress = Math.min(currentLeftProgress + 20, 100);
+    pontosPlayer = playerCard.pontos || 0; // Jogador ganha pontos da sua carta
   } else if (cpuTecnica.vantagens.includes(playerTecnica.id)) {
     // CPU tem vantagem -> aumenta progresso da CPU
-    // CORRIGIDO: Deve somar ao progresso da CPU (currentRightProgress), não do jogador.
     novoRightProgress = Math.min(currentRightProgress + 20, 100);
+    pontosCpu = cpuCard.pontos || 0; // CPU ganha pontos da sua carta
   } else {
     // Empate normal (Ambos ganham 5% de dominação)
     novoLeftProgress = Math.min(currentLeftProgress + 5, 100);
     novoRightProgress = Math.min(currentRightProgress + 5, 100);
+    // Empate: nenhum ponto para ninguém
   }
 
-  return { novoLeftProgress, novoRightProgress };
+  return { novoLeftProgress, novoRightProgress, pontosPlayer, pontosCpu };
 };
 
 /**
@@ -185,7 +203,12 @@ export const processarTurno = (
 
   const cpuCarta = selecionarCartaCpu(cpuCards, turno, rightProgress);
 
-  const { novoLeftProgress, novoRightProgress } = atualizarProgresso(
+  const { 
+    novoLeftProgress, 
+    novoRightProgress, 
+    pontosPlayer, 
+    pontosCpu 
+  } = atualizarProgresso(
     playerCard,
     cpuCarta,
     leftProgress,
@@ -196,7 +219,9 @@ export const processarTurno = (
     playerCard,
     cpuCard: cpuCarta,
     novoLeftProgress,
-    novoRightProgress
+    novoRightProgress,
+    pontosPlayer,
+    pontosCpu
   };
 };
 
@@ -208,11 +233,11 @@ export const processarTurno = (
  * @returns A carta escolhida pela CPU.
  */
 export const processarJogadaCpu = (
-    cpuCards: Carta[],
-    turno: number,
-    rightProgress: number
+  cpuCards: Carta[],
+  turno: number,
+  rightProgress: number
 ): Carta => {
-    return selecionarCartaCpu(cpuCards, turno, rightProgress);
+  return selecionarCartaCpu(cpuCards, turno, rightProgress);
 };
 
 // Exporta também as funções auxiliares que são usadas fora (handleCardClick no ArenaPage)

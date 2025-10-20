@@ -1,26 +1,30 @@
-// lib/gameLogic/arenaHandlers.ts
-import { Dispatch, SetStateAction } from 'react';
-import { Carta } from './cardSetup';
-import { processarTurno } from './combatLogic';
+// src/lib/gameLogic/arenaHandlers.ts
 
-interface HandleConfirmParams {
+import { Carta } from './cardSetup';
+import { processarTurno, TurnoResultado } from './combatLogic';
+
+interface HandleConfirmTurnParams {
   selectedCardId: string;
   playerCards: Carta[];
   cpuCards: Carta[];
   turno: number;
   leftProgress: number;
   rightProgress: number;
-  setPlayerCards: Dispatch<SetStateAction<Carta[]>>;
-  setCpuCards: Dispatch<SetStateAction<Carta[]>>;
-  setActiveCard: Dispatch<SetStateAction<Carta | null>>;
-  setOpponentCard: Dispatch<SetStateAction<Carta | null>>;
-  setLeftProgress: Dispatch<SetStateAction<number>>;
-  setRightProgress: Dispatch<SetStateAction<number>>;
-  setSelectedCard: Dispatch<SetStateAction<string | null>>;
-  setTurno: Dispatch<SetStateAction<number>>;
-  setForceButtonActive: Dispatch<SetStateAction<boolean>>;
+  setPlayerCards: (cards: Carta[]) => void;
+  setCpuCards: (cards: Carta[]) => void;
+  setActiveCard: (card: Carta | null) => void;
+  setOpponentCard: (card: Carta | null) => void;
+  setLeftProgress: (progress: number) => void;
+  setRightProgress: (progress: number) => void;
+  setSelectedCard: (cardId: string | null) => void;
+  setTurno: (turno: number) => void;
+  setForceButtonActive: (active: boolean) => void;
+  // NOVOS PARÂMETROS PARA PONTUAÇÃO
+  setPontosPlayer?: (pontos: number) => void;
+  setPontosCpu?: (pontos: number) => void;
+  pontosPlayer?: number;
+  pontosCpu?: number;
 }
-
 
 export const handleConfirmTurn = ({
   selectedCardId,
@@ -38,25 +42,53 @@ export const handleConfirmTurn = ({
   setSelectedCard,
   setTurno,
   setForceButtonActive,
-}: HandleConfirmParams) => {
-  const cartaSelecionada = playerCards.find((c) => c.id === selectedCardId);
-  if (!cartaSelecionada) return;
+  // Novos parâmetros
+  setPontosPlayer,
+  setPontosCpu,
+  pontosPlayer = 0,
+  pontosCpu = 0
+}: HandleConfirmTurnParams) => {
+  const cartaParaJogar = playerCards.find(card => card.id === selectedCardId);
+  if (!cartaParaJogar) return;
 
-  const resultado = processarTurno(
-    cartaSelecionada,
+  // Processa o turno (AGORA RETORNA PONTUAÇÃO)
+  const resultado: TurnoResultado = processarTurno(
+    cartaParaJogar,
     cpuCards,
     turno,
     leftProgress,
     rightProgress
   );
 
+  // Atualiza estados com base no resultado
+  setActiveCard(resultado.playerCard);
+  setOpponentCard(resultado.cpuCard);
   setLeftProgress(resultado.novoLeftProgress);
   setRightProgress(resultado.novoRightProgress);
+  
+  // ATUALIZA PONTUAÇÃO - se as funções foram fornecidas
+  if (setPontosPlayer && setPontosCpu) {
+    const novoPontosPlayer = pontosPlayer + resultado.pontosPlayer;
+    const novoPontosCpu = pontosCpu + resultado.pontosCpu;
+    
+    setPontosPlayer(novoPontosPlayer);
+    setPontosCpu(novoPontosCpu);
+    
+    console.log(`Pontuação atualizada - Player: ${novoPontosPlayer}, CPU: ${novoPontosCpu}`);
+  }
 
-  setActiveCard(cartaSelecionada);
-  setOpponentCard(resultado.cpuCard);
+  // Remove a carta jogada da mão do jogador
+  const novasCartasPlayer = playerCards.filter(card => card.id !== selectedCardId);
+  setPlayerCards(novasCartasPlayer);
 
+  // Remove a carta jogada da mão da CPU
+  const novasCartasCpu = cpuCards.filter(card => card.id !== resultado.cpuCard.id);
+  setCpuCards(novasCartasCpu);
+
+  // Prepara próximo turno
   setSelectedCard(null);
   setTurno(turno + 1);
   setForceButtonActive(false);
+
+  console.log(`Turno ${turno} finalizado. Pontos: Player ${resultado.pontosPlayer}, CPU ${resultado.pontosCpu}`);
 };

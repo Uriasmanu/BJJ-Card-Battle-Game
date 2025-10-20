@@ -43,6 +43,9 @@ export default function ArenaPage() {
   const [leftProgress, setLeftProgress] = useState(0);
   const [rightProgress, setRightProgress] = useState(0);
 
+  const [pontosPlayer, setPontosPlayer] = useState(0);
+  const [pontosCpu, setPontosCpu] = useState(0);
+
   const canPlayFinalizacao = useCallback(
     (isPlayer: boolean) => canPlayFinalizacaoLogic(isPlayer, leftProgress, rightProgress),
     [leftProgress, rightProgress]
@@ -112,9 +115,13 @@ export default function ArenaPage() {
         setSelectedCard,
         setTurno,
         setForceButtonActive,
+        setPontosPlayer,
+        setPontosCpu,
+        pontosPlayer,
+        pontosCpu,
       });
     },
-    [selectedCard, playerCards, cpuCards, turno, leftProgress, rightProgress]
+    [selectedCard, playerCards, cpuCards, turno, leftProgress, rightProgress, pontosPlayer, pontosCpu]
   );
 
   const useForceAbility = useCallback(() => {
@@ -299,7 +306,11 @@ export default function ArenaPage() {
       {/* Conteúdo Principal */}
       <div className="relative z-30 flex flex-col min-h-screen justify-between p-1 sm:p-2">
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-md px-4">
-          <Placar startTimer={startTimer} />
+          <Placar
+            startTimer={startTimer}
+            leftScore={pontosPlayer}
+            rightScore={pontosCpu}
+          />
         </div>
 
         {/* Área Central */}
