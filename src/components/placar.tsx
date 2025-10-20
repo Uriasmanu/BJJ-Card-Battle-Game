@@ -19,6 +19,7 @@ interface PlacarProps {
   // CALLBACKS PARA ATUALIZAÇÃO (opcional)
   onLeftScoreChange?: (score: number) => void;
   onRightScoreChange?: (score: number) => void;
+  onTimerEnd?: () => void;
 }
 
 export default function Placar({
@@ -27,6 +28,7 @@ export default function Placar({
   initialTime = 180,
   startTimer = false,
   onScoreChange,
+  onTimerEnd,
   // Novas props com valores padrão
   leftScore: externalLeftScore = 0,
   rightScore: externalRightScore = 0,
@@ -36,10 +38,11 @@ export default function Placar({
   rightPenalties: externalRightPenalties = 0,
   onLeftScoreChange,
   onRightScoreChange,
+  
 }: PlacarProps) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(false);
-  
+
   // Estados internos para pontuação (podem ser controlados externamente via props)
   const [leftScore, setLeftScore] = useState(externalLeftScore);
   const [leftAdvantages, setLeftAdvantages] = useState(externalLeftAdvantages);
@@ -85,20 +88,22 @@ export default function Placar({
   useEffect(() => {
     if (!startTimer) return;
 
-    setIsRunning(true);
-    const interval = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setIsRunning(false);
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer);
+          // Chama o callback quando o timer chegar a 0
+          if (onTimerEnd) {
+            onTimerEnd();
+          }
           return 0;
         }
-        return prev - 1;
+        return prevTime - 1;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [startTimer]);
+    return () => clearInterval(timer);
+  }, [startTimer, onTimerEnd]);
 
   return (
     <div className="relative w-[14rem] max-w-full mx-auto">
