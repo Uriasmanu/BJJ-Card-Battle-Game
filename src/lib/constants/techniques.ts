@@ -430,7 +430,7 @@ export const TECNICAS: Tecnica[] = [
     pontos: 2,
     descricao: 'Queda agarrando ambas as pernas do adversário ajoelhado',
     faixa: '(Todas)',
-    vantagens: [],
+    vantagens: ['meia-guarda'],
     defesas: ['defesa-double-leg-ajoelhado'],
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths(''),
