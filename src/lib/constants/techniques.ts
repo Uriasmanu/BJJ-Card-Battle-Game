@@ -836,18 +836,7 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['montada'],
     ...getAssetPaths('jacare-banguela'),
   },
-  {
-    id: 'defesa-single-leg',
-    nome: 'Defesa Single Leg',
-    categoria: 'defesa',
-    dificuldade: 'facil',
-    descricao: 'Defesa contra entrada de single leg',
-    faixa: '(Todas)',
-    vantagens: [],
-    defesas: [],
-    proximosMovimentos: ['passagem-de-guarda'],
-    ...getAssetPaths('defesa-single-leg'),
-  },
+  
 ];
 
 // Funções auxiliares
