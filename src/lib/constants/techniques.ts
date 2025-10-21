@@ -833,7 +833,7 @@ export const TECNICAS: Tecnica[] = [
     faixa: '(Todas)',
     vantagens: ['double-leg-em-pe', 'single-leg', 'defesa-double-leg-ajoelhado', 'chamada-de-guarda', 'guarda-aranha', 'meia-guarda', 'guarda-fechada'],
     defesas: ['defesa-jacare-banguela'],
-    proximosMovimentos: ['montada'],
+    proximosMovimentos: ['joelho-barriga],
     ...getAssetPaths('jacare-banguela'),
   },
   
