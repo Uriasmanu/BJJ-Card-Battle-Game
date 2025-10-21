@@ -106,26 +106,26 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['fuga-de-quadril', 'ponte-sobre-ombro'],
     ...getAssetPaths(''),
   },
-{
-  id: 'cem-quilos',
-  nome: 'Cem Quilos',
-  categoria: 'estabilização',
-  dificuldade: 'intermediario',
-  descricao: 'Técnica de controle por cima, mantendo o peso sobre o oponente para limitar seus movimentos e preparar transições ou finalizações.',
-  faixa: '(Todas)',
-  vantagens: [],
-  defesas: [
-    'Escape de quadril',
-    'Subida de guarda',
-    'Empurrar para criar espaço'
-  ],
-  proximosMovimentos: [
-    'mata-leão',
-    'arm-lock',
-    'raspagem-lateral'
-  ],
-  ...getAssetPaths('cem-quilos'),
-},
+  {
+    id: 'cem-quilos',
+    nome: 'Cem Quilos',
+    categoria: 'estabilização',
+    dificuldade: 'intermediario',
+    descricao: 'Técnica de controle por cima, mantendo o peso sobre o oponente para limitar seus movimentos e preparar transições ou finalizações.',
+    faixa: '(Todas)',
+    vantagens: [],
+    defesas: [
+      'Escape de quadril',
+      'Subida de guarda',
+      'Empurrar para criar espaço'
+    ],
+    proximosMovimentos: [
+      'mata-leão',
+      'arm-lock',
+      'raspagem-lateral'
+    ],
+    ...getAssetPaths('cem-quilos'),
+  },
   {
     id: 'chamada-de-guarda',
     nome: 'Chamada de Guarda',
@@ -417,7 +417,7 @@ export const TECNICAS: Tecnica[] = [
     pontos: 2,
     descricao: 'Queda agarrando ambas as pernas do adversário em pé',
     faixa: '(Todas)',
-    vantagens: [],
+    vantagens: ['chamada-de-guarda, guarda-aranha, meia-guarda, guarda-fechada'],
     defesas: ['defesa-double-leg-em-pe'],
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths('double-leg-em-pe'),
@@ -431,7 +431,7 @@ export const TECNICAS: Tecnica[] = [
     descricao: 'Queda agarrando ambas as pernas do adversário ajoelhado',
     faixa: '(Todas)',
     vantagens: [],
-    defesas: ['defesa-double-leg-ajoelhado'],
+    defesas: ['defesa-double-leg-ajoelhado', 'chamada-de-guarda', 'guarda-aranha', 'meia-guarda', 'guarda-fechada'],
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths(''),
   },
@@ -444,12 +444,10 @@ export const TECNICAS: Tecnica[] = [
     descricao: 'Queda agarrando apenas uma perna do adversário',
     faixa: '(Todas)',
     vantagens: [],
-    defesas: ['defesa-single-leg'],
+    defesas: ['defesa-double-leg-ajoelhado', 'chamada-de-guarda', 'guarda-aranha', 'meia-guarda', 'guarda-fechada'],
     proximosMovimentos: ['passagem-de-guarda'],
     ...getAssetPaths('single-leg'),
   },
-
-  // PASSAGENS DE GUARDA
   {
     id: 'passagem-guarda-emborcado',
     nome: 'Passagem de Guarda Emborcado (Guarda Fechada)',
@@ -503,9 +501,6 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['armlock-guarda-fechada'],
     ...getAssetPaths(''),
   },
-  // 🆕 TÉCNICAS ADICIONADAS
-
-  // JOELHO NA BARRIGA (Knee on Belly)
   {
     id: 'joelho-barriga',
     nome: 'Joelho na Barriga',
@@ -520,7 +515,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // MONTADA
   {
     id: 'montada',
     nome: 'Montada',
@@ -535,7 +529,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // PEGADA DE COSTAS COM GANCHOS
   {
     id: 'costas',
     nome: 'Pegada de Costas com Ganchos',
@@ -549,22 +542,6 @@ export const TECNICAS: Tecnica[] = [
     proximosMovimentos: ['mata-leao', 'estrangulamento-costas'],
     ...getAssetPaths(''),
   },
-
-  // EZEQUIEL CHOKE
-  {
-    id: 'ezequiel-choke',
-    nome: 'Ezequiel Choke',
-    categoria: 'finalizacao',
-    dificuldade: 'intermediario',
-    descricao: 'Estrangulamento aplicado de dentro da guarda ou da montada usando a própria manga e antebraço.',
-    faixa: '(Todas)',
-    vantagens: [],
-    defesas: ['defesa-ezequiel'],
-    proximosMovimentos: ['montada', 'lateral'],
-    ...getAssetPaths(''),
-  },
-
-  // ESTRANGULAMENTO COM GOLA (Lapel Choke)
   {
     id: 'estrangulamento-com-gola',
     nome: 'Estrangulamento com Gola (Lapel Choke)',
@@ -578,21 +555,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // GUILHOTINA
-  {
-    id: 'guillotine',
-    nome: 'Guilhotina',
-    categoria: 'finalizacao',
-    dificuldade: 'intermediario',
-    descricao: 'Estrangulamento frontal com o braço em torno do pescoço, usado ao defender quedas.',
-    faixa: '(Todas)',
-    vantagens: [],
-    defesas: ['defesa-guillotine'],
-    proximosMovimentos: ['montada', 'lateral'],
-    ...getAssetPaths(''),
-  },
-
-  // CROSS COLLAR CHOKE
   {
     id: 'estrangulamento-cruzado',
     nome: 'Estrangulamento Cruzado (Cross Collar Choke)',
@@ -606,7 +568,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // BOW AND ARROW CHOKE
   {
     id: 'estrangulamento-lapeira',
     nome: 'Estrangulamento de Lapeira (Bow and Arrow Choke)',
@@ -765,7 +726,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // DEFESAS E SAÍDAS
   {
     id: 'tirando-adversario-montada',
     nome: 'Tirando o Adversário da Montada',
@@ -839,7 +799,6 @@ export const TECNICAS: Tecnica[] = [
     ...getAssetPaths(''),
   },
 
-  // TÉCNICAS EXISTENTES (mantidas para compatibilidade)
   {
     id: 'armlock-da-montada',
     nome: 'Armlock da montada',
@@ -872,7 +831,7 @@ export const TECNICAS: Tecnica[] = [
     dificuldade: 'facil',
     descricao: 'Técnica de queda utilizando alavanca e controle do quadril',
     faixa: '(Todas)',
-    vantagens: ['double-leg-em-pe', 'single-leg'],
+    vantagens: ['double-leg-em-pe', 'single-leg', 'defesa-double-leg-ajoelhado', 'chamada-de-guarda', 'guarda-aranha', 'meia-guarda', 'guarda-fechada'],
     defesas: ['defesa-jacare-banguela'],
     proximosMovimentos: ['montada'],
     ...getAssetPaths('jacare-banguela'),
