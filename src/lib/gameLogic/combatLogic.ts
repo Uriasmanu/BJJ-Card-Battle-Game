@@ -1,7 +1,15 @@
 // src/lib/gameLogic/combatLogic.ts
 
-import { Carta } from './cardSetup'; // Assumindo que a interface/tipo Carta está em cardSetup
-import { TECNICAS } from '../constants/techniques'; // Importa a lista de técnicas para as regras de vantagem
+import { Carta } from './cardSetup';
+import { TECNICAS } from '../constants/techniques';
+
+// Interface para o histórico de cartas jogadas
+export interface HistoricoCartas {
+  playerCards: Carta[];
+  cpuCards: Carta[];
+  turnos: number;
+  timestamp: number;
+}
 
 // Define o resultado do processamento do turno
 export interface TurnoResultado {
@@ -12,6 +20,56 @@ export interface TurnoResultado {
   pontosPlayer: number;
   pontosCpu: number;
 }
+
+// Chave para armazenar no localStorage
+const HISTORICO_CARTAS_KEY = 'historico_cartas_jogo';
+
+/**
+ * Salva as cartas jogadas no localStorage
+ */
+export const salvarCartasNoHistorico = (playerCard: Carta, cpuCard: Carta): void => {
+  try {
+    // Recupera o histórico atual ou cria um novo
+    const historicoAtual: HistoricoCartas = JSON.parse(
+      localStorage.getItem(HISTORICO_CARTAS_KEY) || '{"playerCards":[],"cpuCards":[],"turnos":0,"timestamp":0}'
+    );
+
+    // Adiciona as novas cartas ao histórico
+    historicoAtual.playerCards.push(playerCard);
+    historicoAtual.cpuCards.push(cpuCard);
+    historicoAtual.turnos += 1;
+    historicoAtual.timestamp = Date.now();
+
+    // Salva no localStorage
+    localStorage.setItem(HISTORICO_CARTAS_KEY, JSON.stringify(historicoAtual));
+  } catch (error) {
+    console.error('Erro ao salvar histórico de cartas:', error);
+  }
+};
+
+/**
+ * Recupera o histórico de cartas do localStorage
+ */
+export const recuperarHistoricoCartas = (): HistoricoCartas | null => {
+  try {
+    const historico = localStorage.getItem(HISTORICO_CARTAS_KEY);
+    return historico ? JSON.parse(historico) : null;
+  } catch (error) {
+    console.error('Erro ao recuperar histórico de cartas:', error);
+    return null;
+  }
+};
+
+/**
+ * Limpa o histórico de cartas do localStorage
+ */
+export const limparHistoricoCartas = (): void => {
+  try {
+    localStorage.removeItem(HISTORICO_CARTAS_KEY);
+  } catch (error) {
+    console.error('Erro ao limpar histórico de cartas:', error);
+  }
+};
 
 /**
  * Verifica se a carta é de finalização.
@@ -227,6 +285,9 @@ export const processarTurno = (
     rightProgress
   );
 
+  // SALVA AS CARTAS NO HISTÓRICO
+  salvarCartasNoHistorico(playerCard, cpuCarta);
+
   return {
     playerCard,
     cpuCard: cpuCarta,
@@ -251,8 +312,6 @@ export const processarJogadaCpu = (
 ): Carta => {
   return selecionarCartaCpu(cpuCards, turno, rightProgress);
 };
-
-
 
 // Exporta também as funções auxiliares que são usadas fora (handleCardClick no ArenaPage)
 export { isFinalizacaoCard, canPlayFinalizacao };
