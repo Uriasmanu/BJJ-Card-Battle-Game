@@ -64,19 +64,6 @@ export default function ArenaPage() {
     setStartTimer(true);
   }, []);
 
-  const handleCardClick = (cardId: string) => {
-    if (!selectedCard) {
-      const cartaClicada = playerCards.find(card => card.id === cardId);
-      if (cartaClicada) {
-        if (isFinalizacaoCard(cartaClicada) && !canPlayFinalizacao(true)) {
-          alert('Você só pode jogar cartas de finalização quando sua barra de progresso estiver em 100%!');
-          return;
-        }
-        setSelectedCard(cardId);
-      }
-    }
-  };
-
   const handleCatalogCardClick = (carta: Carta) => {
     if (isFinalizacaoCard(carta) && !canPlayFinalizacao(true)) {
       alert('Você só pode jogar cartas de finalização quando sua barra de progresso estiver em 100%!');
@@ -152,7 +139,7 @@ export default function ArenaPage() {
   const renderTechniqueSelector = () => {
     if (!selectedCategory) {
       return (
-        <div className="bg-gray-800/95 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-yellow-500/30 shadow-2xl">
+        <div className="bg-gray-800/95 backdrop-blur-sm rounded-xl lg:p-4 sm:p-6 border border-yellow-500/30 shadow-2xl">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-yellow-400">Catálogo de Técnicas</h2>
             <button
@@ -291,7 +278,7 @@ export default function ArenaPage() {
             </div>
 
             {/* Área Central */}
-            <div className="flex-1 flex items-center justify-center relative z-20 top-8 lg:top-0">
+            <div className="flex-1 flex items-center justify-center relative z-20 lg:top-0">
               <div className="text-center w-full max-w-[500px] sm:max-w-[700px]">
                 <div className="rounded-xl p-4 sm:p-6 border border-white/10">
                   <div className="flex justify-center items-center space-x-4">
@@ -350,8 +337,8 @@ export default function ArenaPage() {
               </button>
             </div>
 
-            <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto px-2 sm:px-4 min-h-[140px] sm:min-h-[160px] p-5 top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
-              <div className="absolute top-4 z-40">
+            <div className="player-hand flex lg:justify-center mb-2 sm:mb-4 relative z-20 overflow-x-auto lg:px-2 lg:px-4 min-h-[140px] sm:min-h-[160px] lg:p-5 lg:top-0 scroll-pl-2 sm:scroll-pl-4 scroll-pr-2 sm:scroll-pr-4">
+              <div className="absolute lg:top-4 lg:left-[48%] left-[43%] z-40">
                 <button
                   onClick={() => setShowTechniqueSelector(true)}
                   className="bg-yellow-600 hover:bg-yellow-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
