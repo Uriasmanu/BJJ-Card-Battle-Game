@@ -24,6 +24,7 @@ export interface Carta {
   corDificuldade: string;
   imagemUrl?: string;
   gifUrl?: string;
+  proximosMovimentos?: string[];
 }
 
 // Função para embaralhar array

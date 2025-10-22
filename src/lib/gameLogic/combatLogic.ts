@@ -60,11 +60,11 @@ const atualizarProgresso = (
   cpuCard: Carta,
   currentLeftProgress: number,
   currentRightProgress: number
-): { 
-  novoLeftProgress: number, 
+): {
+  novoLeftProgress: number,
   novoRightProgress: number,
   pontosPlayer: number,
-  pontosCpu: number 
+  pontosCpu: number
 } => {
 
   let novoLeftProgress = currentLeftProgress;
@@ -118,11 +118,11 @@ const atualizarProgresso = (
   const cpuTecnica = TECNICAS.find(t => t.id === cpuCard.id);
 
   if (!playerTecnica || !cpuTecnica) {
-    return { 
-      novoLeftProgress: currentLeftProgress, 
-      novoRightProgress: currentRightProgress, 
-      pontosPlayer: 0, 
-      pontosCpu: 0 
+    return {
+      novoLeftProgress: currentLeftProgress,
+      novoRightProgress: currentRightProgress,
+      pontosPlayer: 0,
+      pontosCpu: 0
     };
   }
 
@@ -144,6 +144,9 @@ const atualizarProgresso = (
   return { novoLeftProgress, novoRightProgress, pontosPlayer, pontosCpu };
 };
 
+// Variável global para armazenar o último movimento da CPU
+let ultimaCpuCard: Carta | null = null;
+
 /**
  * Lógica para selecionar a carta da CPU (incluindo restrição de Turno 1 e verificação de finalização).
  * @param cpuCards Cartas atuais da CPU.
@@ -162,25 +165,34 @@ const selecionarCartaCpu = (cpuCards: Carta[], turno: number, rightProgress: num
       : cpuCards[Math.floor(Math.random() * cpuCards.length)];
 
   } else {
-    // Demais turnos: filtra cartas que podem ser jogadas
+    // Após o primeiro turno, CPU segue os próximos movimentos da última carta
+    if (ultimaCpuCard?.proximosMovimentos?.length) {
+      const opcoesSeguintes = cpuCards.filter((c) =>
+        ultimaCpuCard!.proximosMovimentos!.includes(c.id)
+      );
+
+      if (opcoesSeguintes.length > 0) {
+        const escolhida = opcoesSeguintes[Math.floor(Math.random() * opcoesSeguintes.length)];
+        ultimaCpuCard = escolhida;
+        return escolhida;
+      }
+    }
+
+    // Caso não haja próximos movimentos válidos, aplica a lógica padrão
     const cartasJogaveis = cpuCards.filter(carta => {
-      // CPU não pode jogar finalização se progresso não estiver em 100%
-      // A condição canPlayFinalizacao(false, 0, rightProgress) está correta para verificar o lado da CPU.
       if (isFinalizacaoCard(carta) && !canPlayFinalizacao(false, 0, rightProgress)) {
         return false;
       }
       return true;
     });
 
-    // Se não há cartas jogáveis, escolhe qualquer uma (exceto finalização se não puder)
-    if (cartasJogaveis.length === 0) {
-      // Tenta uma carta que não seja finalização, ou qualquer uma se não houver
-      return cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
-        cpuCards[Math.floor(Math.random() * cpuCards.length)];
-    } else {
-      // Escolhe aleatoriamente entre as jogáveis
-      return cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)];
-    }
+    const escolhida = cartasJogaveis.length > 0
+      ? cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)]
+      : cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
+      cpuCards[Math.floor(Math.random() * cpuCards.length)];
+
+    ultimaCpuCard = escolhida;
+    return escolhida;
   }
 };
 
@@ -203,11 +215,11 @@ export const processarTurno = (
 
   const cpuCarta = selecionarCartaCpu(cpuCards, turno, rightProgress);
 
-  const { 
-    novoLeftProgress, 
-    novoRightProgress, 
-    pontosPlayer, 
-    pontosCpu 
+  const {
+    novoLeftProgress,
+    novoRightProgress,
+    pontosPlayer,
+    pontosCpu
   } = atualizarProgresso(
     playerCard,
     cpuCarta,
@@ -240,57 +252,7 @@ export const processarJogadaCpu = (
   return selecionarCartaCpu(cpuCards, turno, rightProgress);
 };
 
-let ultimaCpuCard: Carta | null = null; // variável para armazenar o último movimento da CPU
 
-const selecionarCartaCpu = (
-  cpuCards: Carta[],
-  turno: number,
-  rightProgress: number
-): Carta => {
-  if (turno === 1) {
-    // Turno 1: CPU escolhe Queda ou Chamada para Guarda
-    const categoriasPermitidas: Carta['categoria'][] = ['chamada para guarda', 'queda'];
-    const opcoesCpu = cpuCards.filter((c) => categoriasPermitidas.includes(c.categoria));
-
-    const escolhida =
-      opcoesCpu.length > 0
-        ? opcoesCpu[Math.floor(Math.random() * opcoesCpu.length)]
-        : cpuCards[Math.floor(Math.random() * cpuCards.length)];
-
-    ultimaCpuCard = escolhida; // guarda a carta escolhida
-    return escolhida;
-  } else {
-    // Depois do primeiro turno, CPU tenta seguir a sequência
-    if (ultimaCpuCard?.proximosMovimentos?.length) {
-      const opcoesSeguintes = cpuCards.filter((c) =>
-        ultimaCpuCard!.proximosMovimentos!.includes(c.id)
-      );
-
-      if (opcoesSeguintes.length > 0) {
-        const escolhida = opcoesSeguintes[Math.floor(Math.random() * opcoesSeguintes.length)];
-        ultimaCpuCard = escolhida;
-        return escolhida;
-      }
-    }
-
-    // Se não tiver próximos movimentos ou não encontrar as cartas listadas, usa a lógica padrão
-    const cartasJogaveis = cpuCards.filter(carta => {
-      if (isFinalizacaoCard(carta) && !canPlayFinalizacao(false, 0, rightProgress)) {
-        return false;
-      }
-      return true;
-    });
-
-    const escolhida =
-      cartasJogaveis.length > 0
-        ? cartasJogaveis[Math.floor(Math.random() * cartasJogaveis.length)]
-        : cpuCards.filter(carta => !isFinalizacaoCard(carta))[0] ||
-          cpuCards[Math.floor(Math.random() * cpuCards.length)];
-
-    ultimaCpuCard = escolhida; // atualiza a última jogada
-    return escolhida;
-  }
-};
 
 // Exporta também as funções auxiliares que são usadas fora (handleCardClick no ArenaPage)
 export { isFinalizacaoCard, canPlayFinalizacao };
